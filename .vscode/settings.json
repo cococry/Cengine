@@ -3,7 +3,7 @@
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "editor.minimap.enabled": true,
     "terminal.integrated.fontWeight": "1",
-    "editor.fontSize": 13,
+    "editor.fontSize": 15,
     "editor.fontWeight": "1",
     "workbench.editor.showTabs": true,
     "workbench.activityBar.visible": true,
@@ -55,7 +55,9 @@
         "event_system.h": "c",
         "global_state.h": "c",
         "windows.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "logging.h": "c",
+        "glad.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

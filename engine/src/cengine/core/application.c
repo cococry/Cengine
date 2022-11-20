@@ -7,6 +7,9 @@
 
 #include "logging.h"
 
+#include "../platform/opengl/loader/glad.h"
+#include "../renderer/render_command.h"
+
 static void close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
@@ -39,6 +42,9 @@ void application_run(application* app) {
         if (platform_is_key_down(KEY_ESCAPE)) {
             application_stop(app);
         }
+
+        render_command_clear_buffers(GL_COLOR_BUFFER_BIT);
+        render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
 
         platform_window_update(app->wnd);
         platform_input_update();

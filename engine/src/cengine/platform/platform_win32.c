@@ -6,8 +6,13 @@
 #include "../core/event_system.h"
 #include "../core/global_state.h"
 
+#include "opengl/gl_loader.h"
+
+#include "opengl/loader/glad_wgl.h"
+
 #include <Windows.h>
 #include <windowsx.h>
+#include <stdlib.h>
 
 input_struct input_state;
 
@@ -15,6 +20,8 @@ typedef struct win32_backend_handle {
     HINSTANCE instance;
     HWND window;
     u32 window_style;
+    HDC device_context;
+    HGLRC render_context;
 } win32_backend_handle;
 
 static LRESULT CALLBACK win32_update_messeges(HWND window, u32 msg, WPARAM w_param, LPARAM l_param) {
@@ -116,7 +123,8 @@ static bool8 update_messages() {
 }
 
 window* platform_window_create(window_properties props) {
-    window* ret = malloc(sizeof(window));
+    load_opengl();
+    window* ret = (window*)malloc(sizeof(window));
     ASSERT_MSG(ret != nullptr || sizeof(ret) != sizeof(window), "Failed to create Win32 window.");
 
     ret->backend_handle = malloc(sizeof(win32_backend_handle));
@@ -192,11 +200,52 @@ window* platform_window_create(window_properties props) {
               props.vsync ? "On" : "Off",
               props.resizable ? "On" : "Off");
 
+    HDC device_context = GetDC(backend_handle->window);
+
+    int pixel_format_attributes[] = {
+        WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+        WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+        WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+        WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+        WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+        WGL_COLOR_BITS_ARB, 32,
+        WGL_DEPTH_BITS_ARB, 24,
+        WGL_STENCIL_BITS_ARB, 8,
+        0};
+
+    int pixel_format = 0;
+    UINT num_formats = 0;
+
+    bool8 res = wglChoosePixelFormatARB(device_context, pixel_format_attributes, nullptr, 1, &pixel_format, &num_formats);
+
+    ASSERT_MSG(res, "Failed to choose pixel format.");
+
+    PIXELFORMATDESCRIPTOR pixel_format_desc = {};
+    DescribePixelFormat(device_context, pixel_format, sizeof(PIXELFORMATDESCRIPTOR), &pixel_format_desc);
+    SetPixelFormat(device_context, pixel_format, &pixel_format_desc);
+
+    int opengl_attributes[] = {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 6,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0};
+
+    backend_handle->render_context = wglCreateContextAttribsARB(device_context, 0, opengl_attributes);
+    ASSERT_MSG(backend_handle->render_context, "Failed to create rendering context.");
+
+    backend_handle->device_context = device_context;
+
+    wglMakeCurrent(backend_handle->device_context, backend_handle->render_context);
+
     return ret;
 }
 
 void platform_window_update(window* wnd) {
     update_messages();
+
+    wglSwapIntervalEXT(wnd->props.vsync);
+    win32_backend_handle* backend_handle = (win32_backend_handle*)wnd->backend_handle;
+    wglSwapLayerBuffers(backend_handle->device_context, WGL_SWAP_MAIN_PLANE);
 }
 
 bool8 platform_window_close_requested(window* wnd) {
@@ -273,7 +322,7 @@ void platform_window_set_ypos(window* wnd, u32 ypos) {
 void platform_window_destroy(window* wnd) {
     win32_backend_handle* backend_handle = (win32_backend_handle*)wnd->backend_handle;
     DestroyWindow(backend_handle->window);
-    free(wnd);
+    free((void*)wnd);
 }
 
 i32 platform_get_mouse_x() {
