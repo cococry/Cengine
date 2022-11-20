@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Engine Build",
+            "windows": {
+                "command": "${workspaceFolder}/engine/build.bat"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/engine"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "Debugger created this task."
+        },
+        {
+            "type": "shell",
+            "label": "Testbed Build",
+            "windows": {
+                "command": "${workspaceFolder}/testbed/build.bat"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/testbed"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+        },
+        {
+            "type": "shell",
+            "label": "Engine & Testbed Build",
+            "windows": {
+                "command": "${workspaceFolder}/scripts/build_all.bat"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
