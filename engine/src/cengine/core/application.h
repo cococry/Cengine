@@ -5,6 +5,7 @@
 
 typedef struct application_state {
     bool8 running;
+    float delta_time;
 } application_state;
 
 typedef struct application {

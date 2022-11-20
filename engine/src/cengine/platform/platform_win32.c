@@ -89,10 +89,27 @@ static LRESULT CALLBACK win32_update_messeges(HWND window, u32 msg, WPARAM w_par
 }
 
 static bool8 update_messages() {
+    INT64 counts_per_sec = 0;
+    QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
+
+    double sec_per_count = 1.0f / 1000.0f;
+
+    INT64 prev_time = 0;
+    QueryPerformanceCounter((LARGE_INTEGER*)&prev_time);
+
     MSG msg;
-    while (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
+    if (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+
+        if (msg.message == WM_QUIT) {
+            return false;
+        }
+    } else {
+        INT64 current_time = 0;
+        QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
+
+        g_state->app->state.delta_time = (float)((current_time - prev_time) * sec_per_count);
     }
 
     return true;

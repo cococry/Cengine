@@ -54,7 +54,8 @@
         "defines.h": "c",
         "event_system.h": "c",
         "global_state.h": "c",
-        "windows.h": "c"
+        "windows.h": "c",
+        "time.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }
