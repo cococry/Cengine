@@ -25,9 +25,16 @@ void vertex_array_unbind(vertex_array* va) {
 }
 
 void vertex_array_delete(vertex_array* va) {
-    glDeleteVertexArrays(1, &va->id);
+    if (va != nullptr) {
+        glDeleteVertexArrays(1, &va->id);
 
-    free(va);
+        for (u32 i = 0; i < va->vertex_buffer_count; i++) {
+            vertex_buffer_delete(va->vertex_buffers[i]);
+        }
+        if (va->index_buffer != nullptr)
+            index_buffer_delete(va->index_buffer);
+        free(va);
+    }
 }
 
 void vertex_array_add_vertex_buffer(vertex_array* va, vertex_buffer* vb) {

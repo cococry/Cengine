@@ -64,7 +64,12 @@
         "glcorearb.h": "c",
         "platform.h": "c",
         "functions.h": "c",
-        "gl_loader.h": "c"
+        "gl_loader.h": "c",
+        "stdio.h": "c",
+        "gl_functions.h": "c",
+        "corecrt_malloc.h": "c",
+        "util.h": "c",
+        "render_defines.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

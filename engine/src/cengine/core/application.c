@@ -10,12 +10,17 @@
 #include "../renderer/render_defines.h"
 #include "../platform/opengl/gl_functions.h"
 
-#include <gl/GL.h>
-#include <gl/GLU.h>
-
 static void close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
+}
+
+static void resize_callback(void* data) {
+    u32* size = (u32*)data;
+    u32 width = size[0];
+    u32 height = size[1];
+
+    render_command_resize_viewport(width, height);
 }
 application* application_create(window_properties props) {
     application* ret = malloc(sizeof(application));
@@ -27,8 +32,11 @@ application* application_create(window_properties props) {
     init_listeners(event_listeners, max_events);
 
     register_event(window_close_event, close_callback, "closeCb");
+    register_event(window_resize_event, resize_callback, "resizeCb");
 
     platform_input_init();
+
+    ret->state.delta_time = 0.0f;
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
@@ -49,7 +57,7 @@ application* application_create(window_properties props) {
     vertex_array_add_vertex_buffer(ret->va, vb);
     vertex_array_set_index_buffer(ret->va, ib);
 
-    ret->state.delta_time = 0.0f;
+    ret->shader = shader_program_create("../engine/assets/shaders/default_vertex.glsl", "../engine/assets/shaders/default_fragment.glsl");
 
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;
@@ -67,6 +75,7 @@ void application_run(application* app) {
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
 
+        shader_program_bind(app->shader);
         render_command_draw_indexed(app->va);
 
         platform_window_update(app->wnd);

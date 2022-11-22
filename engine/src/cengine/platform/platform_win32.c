@@ -59,7 +59,15 @@ static LRESULT CALLBACK win32_update_messeges(HWND window, u32 msg, WPARAM w_par
             PostQuitMessage(0);
             return 0;
         case WM_SIZE: {
-            // TODO: Dispatch event
+            u32 width = GET_X_LPARAM(l_param);
+            u32 height = GET_Y_LPARAM(l_param);
+            u32 size[] = {
+                width, height};
+            if (g_state != nullptr) {
+                g_state->app->wnd->props.width = width;
+                g_state->app->wnd->props.height = height;
+            }
+            dispatch_event(window_resize_event, size);
         } break;
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
@@ -157,7 +165,7 @@ window* platform_window_create(window_properties props) {
         (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 
     load_gl_functions();
-    
+
     window* ret = (window*)malloc(sizeof(window));
     ASSERT_MSG(ret != nullptr || sizeof(ret) != sizeof(window), "Failed to create Win32 window.");
 
