@@ -1,10 +1,8 @@
 #include "gl_loader.h"
 
-#include "loader/glad.h"
-#include "loader/glad_wgl.h"
-
 #include <Windows.h>
-
+#include <gl/GL.h>
+#include <gl/GLU.h>
 #include "../../core/logging.h"
 
 void load_opengl() {
@@ -53,8 +51,4 @@ void load_opengl() {
 
     bool8 res = wglMakeCurrent(window_dc, render_context);
     ASSERT_MSG(res, "Failed to set Glad-loading rendering context.");
-
-    ASSERT_MSG(gladLoadWGL(window_dc), "Failed to initialize Glad with WGL.");
-
-    ASSERT_MSG(gladLoadGL(), "Failed to load Glad.");
 }

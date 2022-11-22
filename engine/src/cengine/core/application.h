@@ -2,6 +2,7 @@
 
 #include "defines.h"
 #include "../platform/platform.h"
+#include "../renderer/vertex_array.h"
 
 typedef struct application_state {
     bool8 running;
@@ -11,6 +12,7 @@ typedef struct application_state {
 typedef struct application {
     application_state state;
     window* wnd;
+    vertex_array* va;
 } application;
 
 application* application_create(window_properties props);

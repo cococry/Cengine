@@ -1,0 +1,15 @@
+#pragma once
+
+#include "ext/glcorearb.h"
+
+extern PFNGLCREATEVERTEXARRAYSPROC glCreateVertexArrays;
+extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+extern PFNGLCREATEBUFFERSPROC glCreateBuffers;
+extern PFNGLBINDBUFFERPROC glBindBuffer;
+extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+
+void load_gl_functions();

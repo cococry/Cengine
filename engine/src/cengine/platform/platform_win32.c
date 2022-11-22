@@ -1,5 +1,4 @@
 #ifdef _WIN32
-#ifdef _WIN64
 
 #include "platform.h"
 #include "../core/logging.h"
@@ -7,12 +6,37 @@
 #include "../core/global_state.h"
 
 #include "opengl/gl_loader.h"
-
-#include "opengl/loader/glad_wgl.h"
+#include "opengl/gl_functions.h"
 
 #include <Windows.h>
 #include <windowsx.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#include "opengl/ext/wglext.h"
+#include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
+
+PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
+PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
+#define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
+
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+
+#define WGL_DRAW_TO_WINDOW_ARB 0x2001
+#define WGL_ACCELERATION_ARB 0x2003
+#define WGL_SUPPORT_OPENGL_ARB 0x2010
+#define WGL_DOUBLE_BUFFER_ARB 0x2011
+#define WGL_PIXEL_TYPE_ARB 0x2013
+#define WGL_COLOR_BITS_ARB 0x2014
+#define WGL_DEPTH_BITS_ARB 0x2022
+#define WGL_STENCIL_BITS_ARB 0x2023
+
+#define WGL_FULL_ACCELERATION_ARB 0x2027
+#define WGL_TYPE_RGBA_ARB 0x202B
 
 input_struct input_state;
 
@@ -124,6 +148,16 @@ static bool8 update_messages() {
 
 window* platform_window_create(window_properties props) {
     load_opengl();
+
+    wglChoosePixelFormatARB =
+        (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+    wglCreateContextAttribsARB =
+        (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+    wglSwapIntervalEXT =
+        (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+
+    load_gl_functions();
+    
     window* ret = (window*)malloc(sizeof(window));
     ASSERT_MSG(ret != nullptr || sizeof(ret) != sizeof(window), "Failed to create Win32 window.");
 
@@ -485,5 +519,4 @@ bool8 platform_mouse_button_changed(mouse_button button) {
     return input_state.button_changed;
 }
 
-#endif
 #endif

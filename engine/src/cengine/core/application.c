@@ -3,12 +3,15 @@
 #include "global_state.h"
 
 #include <stdlib.h>
-#include <time.h>
 
 #include "logging.h"
 
-#include "../platform/opengl/loader/glad.h"
 #include "../renderer/render_command.h"
+#include "../renderer/render_defines.h"
+#include "../platform/opengl/gl_functions.h"
+
+#include <gl/GL.h>
+#include <gl/GLU.h>
 
 static void close_callback(void* data) {
     application* app = (application*)data;
@@ -27,6 +30,25 @@ application* application_create(window_properties props) {
 
     platform_input_init();
 
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f};
+
+    u32 indices[] = {0, 1, 2, 2, 3, 0};
+
+    ret->va = vertex_array_create();
+
+    vertex_buffer* vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 1);
+
+    vertex_buffer_add_layout_attribute(vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
+
+    index_buffer* ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
+
+    vertex_array_add_vertex_buffer(ret->va, vb);
+    vertex_array_set_index_buffer(ret->va, ib);
+
     ret->state.delta_time = 0.0f;
 
     g_state = malloc(sizeof(global_state));
@@ -42,9 +64,10 @@ void application_run(application* app) {
         if (platform_is_key_down(KEY_ESCAPE)) {
             application_stop(app);
         }
-
-        render_command_clear_buffers(GL_COLOR_BUFFER_BIT);
+        render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
+
+        render_command_draw_indexed(app->va);
 
         platform_window_update(app->wnd);
         platform_input_update();
@@ -55,6 +78,7 @@ void application_shutdown(application* app) {
     app->state.running = false;
     platform_window_destroy(app->wnd);
     destroy_listeners(event_listeners, max_events);
+    vertex_array_delete(app->va);
     platform_input_shutdown();
     free(g_state);
 }

@@ -57,7 +57,14 @@
         "windows.h": "c",
         "time.h": "c",
         "logging.h": "c",
-        "glad.h": "c"
+        "glad.h": "c",
+        "glu.h": "c",
+        "wglext.h": "c",
+        "gl.h": "c",
+        "glcorearb.h": "c",
+        "platform.h": "c",
+        "functions.h": "c",
+        "gl_loader.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }
