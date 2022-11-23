@@ -12,9 +12,12 @@
 #include <windowsx.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>
-#include "opengl/ext/wglext.h"
 #include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
+
+typedef BOOL(WINAPI* PFNWGLCHOOSEPIXELFORMATARBPROC)(HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
+typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
+typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
 
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;

@@ -10,6 +10,7 @@
 #include "../renderer/render_defines.h"
 #include "../platform/opengl/gl_functions.h"
 
+#include "../math/vector4.h"
 static void close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
@@ -58,6 +59,9 @@ application* application_create(window_properties props) {
     vertex_array_set_index_buffer(ret->va, ib);
 
     ret->shader = shader_program_create("../engine/assets/shaders/default_vertex.glsl", "../engine/assets/shaders/default_fragment.glsl");
+    shader_program_bind(ret->shader);
+    shader_program_upload_vec4(ret->shader, "uColor", vector4_create(0.5f, 0.7f, 0.3f, 1.0f));
+    shader_program_unbind(ret->shader);
 
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;

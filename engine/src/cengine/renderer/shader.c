@@ -36,6 +36,24 @@ void shader_program_delete(shader_program* program) {
     free(program);
 }
 
+void shader_program_upload_vec2(shader_program* program, const char* uniform_name, vector2 uniform_value) {
+    glUniform2fv(glGetUniformLocation(program->id, uniform_name), 1, vector2_value_ptr(uniform_value));
+}
+void shader_program_upload_vec3(shader_program* program, const char* uniform_name, vector3 uniform_value) {
+    glUniform3fv(glGetUniformLocation(program->id, uniform_name), 1, vector3_value_ptr(uniform_value));
+}
+
+void shader_program_upload_vec4(shader_program* program, const char* uniform_name, vector4 uniform_value) {
+    glUniform4fv(glGetUniformLocation(program->id, uniform_name), 1, vector4_value_ptr(uniform_value));
+}
+
+void shader_program_upload_int(shader_program* program, const char* uniform_name, i32 uniform_value) {
+    glUniform1i(glGetUniformLocation(program->id, uniform_name), uniform_value);
+}
+
+void shader_program_upload_float(shader_program* program, const char* uniform_name, float uniform_value) {
+    glUniform1f(glGetUniformLocation(program->id, uniform_name), uniform_value);
+}
 void _link_gl_shader_program(shader_program* program, render_id vertex_shader, render_id fragment_shader) {
     int linking_success;
     char info_log[512];

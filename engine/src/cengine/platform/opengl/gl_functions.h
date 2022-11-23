@@ -25,5 +25,11 @@ extern PFNGLGETSHADERIVPROC glGetShaderiv;
 extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 extern PFNGLATTACHSHADERPROC glAttachShader;
 extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLUNIFORM2FVPROC glUniform2fv;
+extern PFNGLUNIFORM3FVPROC glUniform3fv;
+extern PFNGLUNIFORM4FVPROC glUniform4fv;
+extern PFNGLUNIFORM1IPROC glUniform1i;
+extern PFNGLUNIFORM1FPROC glUniform1f;
+extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
 void load_gl_functions();
