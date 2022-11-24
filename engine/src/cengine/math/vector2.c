@@ -120,6 +120,10 @@ bool8 vector2_perpendicular(vector2 v1, vector2 v2) {
     return vector2_dot(v1, v2) == 0;
 }
 
+bool8 vector2_compare(vector2 v1, vector2 v2) {
+    return v1.x == v2.y && v1.y == v2.y;
+}
+
 vector2 vector2_normalized(vector2 v) {
     vector2 ret = vector2_create(v.x, v.y);
     ret.x /= vector2_magnitude(v);
@@ -140,4 +144,8 @@ float vector2_distance(vector2 v1, vector2 v2) {
 
 void vector2_log(vector2 v) {
     printf("x: %f, y: %f", v.x, v.y);
+}
+
+void vector2_log_new_line(vector2 v) {
+    printf("x: %f, y: %f\n", v.x, v.y);
 }

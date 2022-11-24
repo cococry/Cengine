@@ -141,6 +141,9 @@ bool8 vector3_perpendicular(vector3 v1, vector3 v2) {
     return vector3_dot(v1, v2) == 0;
 }
 
+bool8 vector3_compare(vector3 v1, vector3 v2) {
+    return v1.x == v2.x && v1.y == v1.y && v1.z == v2.z;
+}
 vector3 vector3_normalized(vector3 v) {
     vector3 ret = vector3_create(v.x, v.y, v.z);
     ret.x /= vector3_magnitude(v);
@@ -163,4 +166,8 @@ float vector3_distance(vector3 v1, vector3 v2) {
 
 void vector3_log(vector3 v) {
     printf("x: %f, y: %f, z: %f", v.x, v.y, v.z);
+}
+
+void vector3_log_new_line(vector3 v) {
+    printf("x: %f, y: %f, z: %f\n2", v.x, v.y, v.z);
 }

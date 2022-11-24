@@ -51,6 +51,10 @@ void shader_program_upload_int(shader_program* program, const char* uniform_name
     glUniform1i(glGetUniformLocation(program->id, uniform_name), uniform_value);
 }
 
+void shader_program_upload_mat4(shader_program* program, const char* uniform_name, matrix4 uniform_value) {
+    glUniformMatrix4fv(glGetUniformLocation(program->id, uniform_name), 1, GL_FALSE, matrix4_value_ptr(uniform_value));
+}
+
 void shader_program_upload_float(shader_program* program, const char* uniform_name, float uniform_value) {
     glUniform1f(glGetUniformLocation(program->id, uniform_name), uniform_value);
 }

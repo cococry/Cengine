@@ -30,6 +30,9 @@ PFNGLUNIFORM3FVPROC glUniform3fv;
 PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
+PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
 void load_gl_functions() {
@@ -87,7 +90,12 @@ void load_gl_functions() {
         (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
     glUniform1f =
         (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
-
     glGetUniformLocation =
         (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
+    glUniformMatrix4fv =
+        (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
+    glUniformMatrix3fv =
+        (PFNGLUNIFORMMATRIX3FVPROC)wglGetProcAddress("glUniformMatrix3fv");
+    glUniformMatrix2fv =
+        (PFNGLUNIFORMMATRIX2FVPROC)wglGetProcAddress("glUniformMatrix2fv");
 }

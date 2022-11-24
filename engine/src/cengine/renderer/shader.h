@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../math/vector.h"
+#include "../math/matrix.h"
 
 #include "../core/defines.h"
 #include "render_defines.h"
@@ -22,6 +23,8 @@ void shader_program_upload_vec2(shader_program* program, const char* uniform_nam
 void shader_program_upload_vec3(shader_program* program, const char* uniform_name, vector3 uniform_value);
 
 void shader_program_upload_vec4(shader_program* program, const char* uniform_name, vector4 uniform_value);
+
+void shader_program_upload_mat4(shader_program* program, const char* uniform_name, matrix4 uniform_value);
 
 void shader_program_upload_int(shader_program* program, const char* uniform_name, i32 uniform_value);
 

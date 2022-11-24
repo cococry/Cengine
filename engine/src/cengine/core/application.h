@@ -5,6 +5,8 @@
 #include "../renderer/vertex_array.h"
 #include "../renderer/shader.h"
 
+#include "../math/vector.h"
+
 typedef struct application_state {
     bool8 running;
     float delta_time;
@@ -15,7 +17,7 @@ typedef struct application {
     window* wnd;
     vertex_array* va;
     shader_program* shader;
-
+    vector3 cam_pos;
 } application;
 
 application* application_create(window_properties props);

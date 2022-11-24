@@ -52,6 +52,8 @@ float vector2_magnitude_squared(vector2 v);
 
 bool8 vector2_perpendicular(vector2 v1, vector2 v2);
 
+bool8 vector2_compare(vector2 v1, vector2 v2);
+
 vector2 vector2_normalized(vector2 v);
 
 void vector2_normalize(vector2* v);
@@ -59,3 +61,5 @@ void vector2_normalize(vector2* v);
 float vector2_distance(vector2 v1, vector2 v2);
 
 void vector2_log(vector2 v);
+
+void vector2_log_new_line(vector2 v);

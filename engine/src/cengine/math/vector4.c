@@ -142,6 +142,10 @@ bool8 vector4_perpendicular(vector4 v1, vector4 v2) {
     return vector4_dot(v1, v2) == 0;
 }
 
+bool8 vector4_compare(vector4 v1, vector4 v2) {
+    return v1.x == v2.x && v1.y == v1.y && v1.z == v2.z && v1.w == v2.w;
+}
+
 vector4 vector4_normalized(vector4 v) {
     vector4 ret = vector4_create(v.x, v.y, v.z, v.w);
     ret.x /= vector4_magnitude(v);
@@ -166,4 +170,8 @@ float vector4_distance(vector4 v1, vector4 v2) {
 
 void vector4_log(vector4 v) {
     printf("x: %f, y: %f, z: %f, w: %f", v.x, v.y, v.z, v.w);
+}
+
+void vector4_log_new_line(vector4 v) {
+    printf("x: %f, y: %f, z: %f, w: %f\n", v.x, v.y, v.z, v.w);
 }

@@ -69,7 +69,12 @@
         "gl_functions.h": "c",
         "corecrt_malloc.h": "c",
         "util.h": "c",
-        "render_defines.h": "c"
+        "render_defines.h": "c",
+        "vector.h": "c",
+        "matrix4.h": "c",
+        "matrix3.h": "c",
+        "matrix.h": "c",
+        "matrix2.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

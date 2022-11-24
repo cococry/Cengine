@@ -30,6 +30,9 @@ extern PFNGLUNIFORM3FVPROC glUniform3fv;
 extern PFNGLUNIFORM4FVPROC glUniform4fv;
 extern PFNGLUNIFORM1IPROC glUniform1i;
 extern PFNGLUNIFORM1FPROC glUniform1f;
+extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+extern PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
+extern PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
 extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
 void load_gl_functions();
