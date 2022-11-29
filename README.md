@@ -1,2 +1,2 @@
 # Cengine
-Engine in C without any dependencies 
+Engine in C without minimal dependencies 
