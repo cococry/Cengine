@@ -4,6 +4,7 @@
 #include "../platform/platform.h"
 #include "../renderer/vertex_array.h"
 #include "../renderer/shader.h"
+#include "../renderer/texture.h"
 
 #include "../math/vector.h"
 
@@ -17,6 +18,7 @@ typedef struct application {
     window* wnd;
     vertex_array* va;
     shader_program* shader;
+    texture2d* texture;
     vector3 cam_pos;
 } application;
 

@@ -4,9 +4,11 @@
 
 matrix4 translate_mv(matrix4 m, vector3 v) {
     matrix4 ret = m;
-    ret.row4.x += v.x;
-    ret.row4.y += v.y;
-    ret.row4.z += v.z;
+    ret.row4 = vector4_additition(vector4_additition(
+                                      vector4_scaler_multiplication(m.row1, v.x),
+                                      vector4_scaler_multiplication(m.row2, v.y)),
+                                  vector4_additition(vector4_scaler_multiplication(m.row3, v.z),
+                                                     m.row4));
     return ret;
 }
 
@@ -43,35 +45,35 @@ matrix4 rotate_mv_angle(matrix4 m, float angle, vector3 v) {
     vector4 row1 = vector4_additition(
         vector4_additition(
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 1),
+                matrix4_get_column(m, 0),
                 rotate.row1.x),
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 2),
+                matrix4_get_column(m, 1),
                 rotate.row1.y)),
 
         vector4_scaler_multiplication(
-            matrix4_get_column(m, 3),
+            matrix4_get_column(m, 2),
             rotate.row1.z));
     vector4 row2 = vector4_additition(
         vector4_additition(
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 1),
+                matrix4_get_column(m, 0),
                 rotate.row2.x),
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 2),
+                matrix4_get_column(m, 1),
                 rotate.row2.y)),
-        vector4_scaler_multiplication(matrix4_get_column(m, 3), rotate.row2.z));
+        vector4_scaler_multiplication(matrix4_get_column(m, 2), rotate.row2.z));
     vector4 row3 = vector4_additition(
         vector4_additition(
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 1),
+                matrix4_get_column(m, 0),
                 rotate.row3.x),
             vector4_scaler_multiplication(
-                matrix4_get_column(m, 2),
+                matrix4_get_column(m, 1),
                 rotate.row3.y)),
-        vector4_scaler_multiplication(matrix4_get_column(m, 3), rotate.row3.z));
+        vector4_scaler_multiplication(matrix4_get_column(m, 2), rotate.row3.z));
 
-    vector4 row4 = matrix4_get_column(m, 4);
+    vector4 row4 = matrix4_get_column(m, 3);
 
     matrix4 ret = matrix4_create_by_value(0.0f);
     ret.row1 = row1;
@@ -83,11 +85,11 @@ matrix4 rotate_mv_angle(matrix4 m, float angle, vector3 v) {
 }
 
 matrix4 scale_mv(matrix4 m, vector3 v) {
-    matrix4 ret = matrix4_create_by_value(0.0f);
-    ret.row1 = vector4_scaler_multiplication(matrix4_get_column(m, 1), v.x);
-    ret.row2 = vector4_scaler_multiplication(matrix4_get_column(m, 2), v.y);
-    ret.row3 = vector4_scaler_multiplication(matrix4_get_column(m, 3), v.z);
-    ret.row4 = matrix4_get_column(m, 4);
+    matrix4 ret;
+    ret.row1 = vector4_scaler_multiplication(m.row1, v.x);
+    ret.row2 = vector4_scaler_multiplication(m.row2, v.y);
+    ret.row3 = vector4_scaler_multiplication(m.row3, v.z);
+    ret.row4 = m.row4;
     return ret;
 }
 
@@ -114,7 +116,25 @@ matrix4 look_at_matrix(vector3 eye, vector3 center, vector3 up) {
 }
 
 matrix4 perspective_matrix(float fov, float aspect, float near, float far) {
+    const float tan_half_fov = (float)tan(fov / 2);
+
+    matrix4 ret = matrix4_create_by_value(0.0f);
+    ret.row1.x = 1 / (aspect * tan_half_fov);
+    ret.row2.y = 1 / tan_half_fov;
+    ret.row3.z = -(far + near) / (far - near);
+    ret.row3.w = -1;
+    ret.row4.z = -(2 * far * near) / (far - near);
+
+    return ret;
 }
 
 matrix4 orthographic_matrix(float left, float right, float bottom, float top) {
+    matrix4 ret = matrix4_identity();
+    ret.row1.x = 2 / (right - left);
+    ret.row2.y = 2 / (top - bottom);
+    ret.row3.z = -1;
+    ret.row4.x = -(right + left) / (right - left);
+    ret.row4.y = -(top + bottom) / (top - bottom);
+
+    return ret;
 }

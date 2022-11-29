@@ -35,6 +35,15 @@ PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
 PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
+PFNGLCREATETEXTURESPROC glCreateTextures;
+PFNGLTEXTURESTORAGE2DPROC glTextureStorage2D;
+PFNGLTEXTUREPARAMETERIPROC glTextureParameteri;
+PFNGLTEXTURESUBIMAGE2DPROC glTextureSubImage2D;
+PFNGLBINDTEXTUREPROC glBindTexture;
+PFNGLDELETETEXTURESPROC glDeleteTextures;
+PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
+
 void load_gl_functions() {
     glCreateVertexArrays =
         (PFNGLCREATEVERTEXARRAYSPROC)wglGetProcAddress("glCreateVertexArrays");
@@ -98,4 +107,20 @@ void load_gl_functions() {
         (PFNGLUNIFORMMATRIX3FVPROC)wglGetProcAddress("glUniformMatrix3fv");
     glUniformMatrix2fv =
         (PFNGLUNIFORMMATRIX2FVPROC)wglGetProcAddress("glUniformMatrix2fv");
+    glCreateTextures =
+        (PFNGLCREATETEXTURESPROC)wglGetProcAddress("glCreateTextures");
+    glTextureStorage2D =
+        (PFNGLTEXTURESTORAGE2DPROC)wglGetProcAddress("glTextureStorage2D");
+    glTextureParameteri =
+        (PFNGLTEXTUREPARAMETERIPROC)wglGetProcAddress("glTextureParameteri");
+    glTextureSubImage2D =
+        (PFNGLTEXTURESUBIMAGE2DPROC)wglGetProcAddress("glTextureSubImage2D");
+    glBindTexture =
+        (PFNGLBINDTEXTUREPROC)wglGetProcAddress("glBindTexture");
+    glDeleteTextures =
+        (PFNGLDELETETEXTURESPROC)wglGetProcAddress("glDeleteTextures");
+    glActiveTexture =
+        (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+    glBindTextureUnit =
+        (PFNGLBINDTEXTUREUNITPROC)wglGetProcAddress("glBindTextureUnit");
 }

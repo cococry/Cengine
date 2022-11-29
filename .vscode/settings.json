@@ -74,7 +74,8 @@
         "matrix4.h": "c",
         "matrix3.h": "c",
         "matrix.h": "c",
-        "matrix2.h": "c"
+        "matrix2.h": "c",
+        "stb_image.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

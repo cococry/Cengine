@@ -46,7 +46,7 @@ vector4 matrix4_get_row(matrix4 m, u32 index);
 
 matrix4 matrix4_multiply(matrix4 m1, matrix4 m2);
 
-void matrix4_mulm(matrix4* source, matrix4 m);
+void matrix4_multm(matrix4* source, matrix4 m);
 
 matrix4 matrix4_divide(matrix4 m1, matrix4 m2);
 

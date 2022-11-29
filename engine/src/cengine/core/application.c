@@ -11,6 +11,11 @@
 #include "../platform/opengl/gl_functions.h"
 
 #include "../math/matrix.h"
+#include "../math/radians.h"
+
+#include "../../../vendor/stb_image/stb_image.h"
+
+static vector3 cam_pos;
 
 static void close_callback(void* data) {
     application* app = (application*)data;
@@ -24,6 +29,7 @@ static void resize_callback(void* data) {
 
     render_command_resize_viewport(width, height);
 }
+
 application* application_create(window_properties props) {
     application* ret = malloc(sizeof(application));
     ret->wnd = platform_window_create(props);
@@ -41,18 +47,19 @@ application* application_create(window_properties props) {
     ret->state.delta_time = 0.0f;
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f};
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
 
     u32 indices[] = {0, 1, 2, 2, 3, 0};
 
     ret->va = vertex_array_create();
 
-    vertex_buffer* vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 1);
+    vertex_buffer* vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 2);
 
     vertex_buffer_add_layout_attribute(vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
+    vertex_buffer_add_layout_attribute(vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
 
     index_buffer* ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
 
@@ -62,14 +69,17 @@ application* application_create(window_properties props) {
     ret->shader = shader_program_create("../engine/assets/shaders/default_vertex.glsl", "../engine/assets/shaders/default_fragment.glsl");
     shader_program_bind(ret->shader);
     shader_program_upload_vec4(ret->shader, "uColor", vector4_create(0.5f, 0.7f, 0.3f, 1.0f));
+    shader_program_upload_int(ret->shader, "uTexture", 0);
 
-    ret->cam_pos = vector3_create(0.0f, 0.0f, 0.0f);
+    cam_pos = vector3_create(300.0f, 300.0f, 0.0f);
 
-    shader_program_upload_mat4(ret->shader, "u_model",
-                               translate_mv(matrix4_identity(), ret->cam_pos));
+    shader_program_upload_mat4(ret->shader, "u_proj",
+                               orthographic_matrix(0.0f, 1280.0f, 0.0f, 720.0f));
+
+    ret->texture = texture2d_create("../engine/assets/textures/grass.jpg");
+
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;
-
     return ret;
 }
 
@@ -80,21 +90,22 @@ void application_run(application* app) {
         if (platform_is_key_down(KEY_ESCAPE)) {
             application_stop(app);
         }
-        if (platform_is_key_down(KEY_A)) {
-            app->cam_pos.x -= 1.0f * 0.007;
-        }
-        if (platform_is_key_down(KEY_D)) {
-            app->cam_pos.x += 1.0f * 0.007;
-        }
+
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
 
         shader_program_bind(app->shader);
+        texture2d_bind(app->texture);
+        texture2d_bind_unit(app->texture, 0);
 
-        shader_program_upload_mat4(app->shader, "u_model",
-                                   translate_mv(matrix4_identity(), app->cam_pos));
+        matrix4 model_matrix =
+            matrix4_multiply(
+                translate_mv(matrix4_identity(), vector3_create(1280.0f / cam_pos.x, 720.0f / cam_pos.y, 0.0f)),
+                scale_mv(matrix4_identity(), vector3_create(100.0f, 100.0f, 0.0f)));
+
+        shader_program_upload_mat4(app->shader, "u_model", model_matrix);
+
         render_command_draw_indexed(app->va);
-        shader_program_unbind(app->shader);
 
         platform_window_update(app->wnd);
         platform_input_update();

@@ -35,4 +35,13 @@ extern PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
 extern PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
 extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
+extern PFNGLCREATETEXTURESPROC glCreateTextures;
+extern PFNGLTEXTURESTORAGE2DPROC glTextureStorage2D;
+extern PFNGLTEXTUREPARAMETERIPROC glTextureParameteri;
+extern PFNGLTEXTURESUBIMAGE2DPROC glTextureSubImage2D;
+extern PFNGLBINDTEXTUREPROC glBindTexture;
+extern PFNGLDELETETEXTURESPROC glDeleteTextures;
+extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+extern PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
+
 void load_gl_functions();

@@ -161,17 +161,30 @@ void matrix3_subm(matrix3* source, matrix3 m) {
 }
 
 matrix3 matrix3_multiply(matrix3 m1, matrix3 m2) {
-    matrix3 ret = matrix3_create(m1.row1, m1.row2, m1.row3);
-    vector3_multv(&ret.row1, m2.row1);
-    vector3_multv(&ret.row2, m2.row2);
-    vector3_multv(&ret.row3, m2.row3);
+    matrix3 ret;
+
+    vector3 m2_col1 = matrix3_get_column(m2, 0);
+    vector3 m2_col2 = matrix3_get_column(m2, 1);
+    vector3 m2_col3 = matrix3_get_column(m2, 2);
+
+    ret.row1.x = m1.row1.x * m2_col1.x + m1.row1.y * m2_col1.y + m1.row1.z * m2_col1.z;
+    ret.row1.y = m1.row1.x * m2_col2.x + m1.row1.y * m2_col2.y + m1.row1.z * m2_col2.z;
+    ret.row1.z = m1.row1.x * m2_col3.x + m1.row1.y * m2_col3.y + m1.row1.z * m2_col3.z;
+
+    ret.row2.x = m1.row2.x * m2_col1.x + m1.row2.y * m2_col1.y + m1.row2.z * m2_col1.z;
+    ret.row2.y = m1.row2.x * m2_col2.x + m1.row2.y * m2_col2.y + m1.row2.z * m2_col2.z;
+    ret.row2.z = m1.row2.x * m2_col3.x + m1.row2.y * m2_col3.y + m1.row2.z * m2_col3.z;
+
+    ret.row3.x = m1.row3.x * m2_col1.x + m1.row3.y * m2_col1.y + m1.row3.z * m2_col1.z;
+    ret.row3.y = m1.row3.x * m2_col2.x + m1.row3.y * m2_col2.y + m1.row3.z * m2_col2.z;
+    ret.row3.z = m1.row3.x * m2_col3.x + m1.row3.y * m2_col3.y + m1.row3.z * m2_col3.z;
+
     return ret;
 }
 
 void matrix3_mulm(matrix3* source, matrix3 m) {
-    vector3_multv(&source->row1, m.row1);
-    vector3_multv(&source->row2, m.row2);
-    vector3_multv(&source->row3, m.row3);
+    matrix3 res = matrix3_multiply(*source, m);
+    source = &res;
 }
 
 matrix3 matrix3_divide(matrix3 m1, matrix3 m2) {

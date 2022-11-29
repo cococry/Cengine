@@ -10,8 +10,6 @@
 
 #include <Windows.h>
 #include <windowsx.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
 #include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
 

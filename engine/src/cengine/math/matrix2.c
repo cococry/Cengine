@@ -135,15 +135,23 @@ void matrix2_subm(matrix2* source, matrix2 m) {
 }
 
 matrix2 matrix2_multiply(matrix2 m1, matrix2 m2) {
-    matrix2 ret = matrix2_create(m1.row1, m1.row2);
-    vector2_multv(&ret.row1, m2.row1);
-    vector2_multv(&ret.row2, m2.row2);
+    matrix2 ret;
+
+    vector2 m2_col1 = matrix2_get_column(m2, 0);
+    vector2 m2_col2 = matrix2_get_column(m2, 1);
+
+    ret.row1.x = m1.row1.x * m2_col1.x + m1.row1.y * m2_col1.y;
+    ret.row1.y = m1.row1.x * m2_col2.x + m1.row1.y * m2_col2.y;
+
+    ret.row2.x = m1.row2.x * m2_col1.x + m1.row2.y * m2_col1.y;
+    ret.row2.y = m1.row2.x * m2_col2.x + m1.row2.y * m2_col2.y;
+
     return ret;
 }
 
 void matrix2_mulm(matrix2* source, matrix2 m) {
-    vector2_multv(&source->row1, m.row1);
-    vector2_multv(&source->row2, m.row2);
+    matrix2 res = matrix2_multiply(*source, m);
+    source = &res;
 }
 
 matrix2 matrix2_divide(matrix2 m1, matrix2 m2) {

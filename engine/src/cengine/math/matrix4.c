@@ -154,26 +154,28 @@ matrix4 matrix4_subtraction(matrix4 m1, matrix4 m2) {
 }
 
 vector4 matrix4_get_column(matrix4 m, u32 index) {
-    ASSERT_MSG(index < VECTOR4_ELEMENT_COUNT, "Matrix column index out of bounds.");
+    u32 index_r = index--;
+    ASSERT_MSG(index_r <= VECTOR4_ELEMENT_COUNT, "Matrix column index out of bounds.");
 
     float* matrix_values = matrix4_value_ptr(m);
-    u32 x_index = 0 + index;
-    u32 y_index = VECTOR4_ELEMENT_COUNT + index;
-    u32 z_index = VECTOR4_ELEMENT_COUNT * 2 + index;
-    u32 w_index = VECTOR4_ELEMENT_COUNT * 3 + index;
+    u32 x_index = 0 + index_r;
+    u32 y_index = VECTOR4_ELEMENT_COUNT + index_r;
+    u32 z_index = VECTOR4_ELEMENT_COUNT * 2 + index_r;
+    u32 w_index = VECTOR4_ELEMENT_COUNT * 3 + index_r;
     vector4 ret = vector4_create(matrix_values[x_index], matrix_values[y_index],
                                  matrix_values[z_index], matrix_values[w_index]);
     return ret;
 }
 
 vector4 matrix4_get_row(matrix4 m, u32 index) {
-    ASSERT_MSG(index < VECTOR4_ELEMENT_COUNT, "Matrix column index out of bounds.");
+    u32 index_r = index--;
+    ASSERT_MSG(index_r <= VECTOR4_ELEMENT_COUNT, "Matrix column index out of bounds.");
 
     float* matrix_values = matrix4_value_ptr(m);
-    u32 x_index = 0 + (index * VECTOR4_ELEMENT_COUNT);
-    u32 y_index = 1 + (index * VECTOR4_ELEMENT_COUNT);
-    u32 z_index = 2 + (index * VECTOR4_ELEMENT_COUNT);
-    u32 w_index = 3 + (index * VECTOR4_ELEMENT_COUNT);
+    u32 x_index = 0 + (index_r * VECTOR4_ELEMENT_COUNT);
+    u32 y_index = 1 + (index_r * VECTOR4_ELEMENT_COUNT);
+    u32 z_index = 2 + (index_r * VECTOR4_ELEMENT_COUNT);
+    u32 w_index = 3 + (index_r * VECTOR4_ELEMENT_COUNT);
     vector4 ret = vector4_create(matrix_values[x_index], matrix_values[y_index],
                                  matrix_values[z_index], matrix_values[w_index]);
     return ret;
@@ -187,19 +189,39 @@ void matrix4_subm(matrix4* source, matrix4 m) {
 }
 
 matrix4 matrix4_multiply(matrix4 m1, matrix4 m2) {
-    matrix4 ret = matrix4_create(m1.row1, m1.row2, m1.row3, m1.row4);
-    vector4_multv(&ret.row1, m2.row1);
-    vector4_multv(&ret.row2, m2.row2);
-    vector4_multv(&ret.row3, m2.row3);
-    vector4_multv(&ret.row4, m2.row4);
+    matrix4 ret;
+
+    vector4 m2_col1 = matrix4_get_column(m2, 0);
+    vector4 m2_col2 = matrix4_get_column(m2, 1);
+    vector4 m2_col3 = matrix4_get_column(m2, 2);
+    vector4 m2_col4 = matrix4_get_column(m2, 3);
+
+    ret.row1.x = m1.row1.x * m2_col1.x + m1.row1.y * m2_col1.y + m1.row1.z * m2_col1.z + m1.row1.w * m2_col1.w;
+    ret.row1.y = m1.row1.x * m2_col2.x + m1.row1.y * m2_col2.y + m1.row1.z * m2_col2.z + m1.row1.w * m2_col2.w;
+    ret.row1.z = m1.row1.x * m2_col3.x + m1.row1.y * m2_col3.y + m1.row1.z * m2_col3.z + m1.row1.w * m2_col3.w;
+    ret.row1.w = m1.row1.x * m2_col4.x + m1.row1.y * m2_col4.y + m1.row1.z * m2_col4.z + m1.row1.w * m2_col4.w;
+
+    ret.row2.x = m1.row2.x * m2_col1.x + m1.row2.y * m2_col1.y + m1.row2.z * m2_col1.z + m1.row2.w * m2_col1.w;
+    ret.row2.y = m1.row2.x * m2_col2.x + m1.row2.y * m2_col2.y + m1.row2.z * m2_col2.z + m1.row2.w * m2_col2.w;
+    ret.row2.z = m1.row2.x * m2_col3.x + m1.row2.y * m2_col3.y + m1.row2.z * m2_col3.z + m1.row2.w * m2_col3.w;
+    ret.row2.w = m1.row2.x * m2_col4.x + m1.row2.y * m2_col4.y + m1.row2.z * m2_col4.z + m1.row2.w * m2_col4.w;
+
+    ret.row3.x = m1.row3.x * m2_col1.x + m1.row3.y * m2_col1.y + m1.row3.z * m2_col1.z + m1.row3.w * m2_col1.w;
+    ret.row3.y = m1.row3.x * m2_col2.x + m1.row3.y * m2_col2.y + m1.row3.z * m2_col2.z + m1.row3.w * m2_col2.w;
+    ret.row3.z = m1.row3.x * m2_col3.x + m1.row3.y * m2_col3.y + m1.row3.z * m2_col3.z + m1.row3.w * m2_col3.w;
+    ret.row3.w = m1.row3.x * m2_col4.x + m1.row3.y * m2_col4.y + m1.row3.z * m2_col4.z + m1.row3.w * m2_col4.w;
+
+    ret.row4.x = m1.row4.x * m2_col1.x + m1.row4.y * m2_col1.y + m1.row4.z * m2_col1.z + m1.row4.w * m2_col1.w;
+    ret.row4.y = m1.row4.x * m2_col2.x + m1.row4.y * m2_col2.y + m1.row4.z * m2_col2.z + m1.row4.w * m2_col2.w;
+    ret.row4.z = m1.row4.x * m2_col3.x + m1.row4.y * m2_col3.y + m1.row4.z * m2_col3.z + m1.row4.w * m2_col3.w;
+    ret.row4.w = m1.row4.x * m2_col4.x + m1.row4.y * m2_col4.y + m1.row4.z * m2_col4.z + m1.row4.w * m2_col4.w;
+
     return ret;
 }
 
-void matrix4_mulm(matrix4* source, matrix4 m) {
-    vector4_multv(&source->row1, m.row1);
-    vector4_multv(&source->row2, m.row2);
-    vector4_multv(&source->row3, m.row3);
-    vector4_multv(&source->row4, m.row4);
+void matrix4_multm(matrix4* source, matrix4 m) {
+    matrix4 res = matrix4_multiply(*source, m);
+    source = &res;
 }
 
 matrix4 matrix4_divide(matrix4 m1, matrix4 m2) {
@@ -220,10 +242,10 @@ void matrix4_divm(matrix4* source, matrix4 m) {
 
 matrix4 matrix4_transpose(matrix4 m) {
     matrix4 ret = matrix4_create_by_value(0.0f);
-    ret.row1 = matrix4_get_column(m, 0);
-    ret.row2 = matrix4_get_column(m, 1);
-    ret.row3 = matrix4_get_column(m, 2);
-    ret.row4 = matrix4_get_column(m, 3);
+    ret.row1 = matrix4_get_column(m, 1);
+    ret.row2 = matrix4_get_column(m, 2);
+    ret.row3 = matrix4_get_column(m, 3);
+    ret.row4 = matrix4_get_column(m, 4);
     return ret;
 }
 

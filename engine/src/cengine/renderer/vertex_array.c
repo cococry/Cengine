@@ -44,10 +44,12 @@ void vertex_array_add_vertex_buffer(vertex_array* va, vertex_buffer* vb) {
     u32 stride = 0;
     for (u32 i = 0; i < vb->layout_attribute_count; i++) {
         stride += vb->layout_attributes[i]._element_count * sizeof(float);
-        glVertexAttribPointer(va->vertex_buffer_count, vb->layout_attributes[i]._element_count,
+    }
+    for (u32 i = 0; i < vb->layout_attribute_count; i++) {
+        glVertexAttribPointer(i, vb->layout_attributes[i]._element_count,
                               GL_FLOAT, GL_FALSE, stride, (void*)(intptr_t)va->_vertex_attribute_offset);
-        glEnableVertexAttribArray(va->vertex_buffer_count);
-        va->_vertex_attribute_offset += stride;
+        glEnableVertexAttribArray(i);
+        va->_vertex_attribute_offset += vb->layout_attributes[i]._element_count * sizeof(float);
     }
 
     va->vertex_buffers[va->vertex_buffer_count++] = vb;
