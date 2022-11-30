@@ -44,4 +44,7 @@ extern PFNGLDELETETEXTURESPROC glDeleteTextures;
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
 extern PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
 
+extern PFNGLENABLEPROC glEnable;
+extern PFNGLBLENDFUNCPROC glBlendFunc;
+
 void load_gl_functions();

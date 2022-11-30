@@ -16,10 +16,7 @@ typedef struct application_state {
 typedef struct application {
     application_state state;
     window* wnd;
-    vertex_array* va;
     shader_program* shader;
-    texture2d* texture;
-    vector3 block_pos;
 } application;
 
 application* application_create(window_properties props);

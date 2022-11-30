@@ -75,7 +75,8 @@
         "matrix3.h": "c",
         "matrix.h": "c",
         "matrix2.h": "c",
-        "stb_image.h": "c"
+        "stb_image.h": "c",
+        "vertex_array.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

@@ -43,8 +43,14 @@ PFNGLBINDTEXTUREPROC glBindTexture;
 PFNGLDELETETEXTURESPROC glDeleteTextures;
 PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
+PFNGLENABLEPROC glEnable;
+PFNGLBLENDFUNCPROC glBlendFunc;
 
 void load_gl_functions() {
+    glBlendFunc =
+        (PFNGLBLENDFUNCPROC)wglGetProcAddress("glBlendFunc");
+    glEnable =
+        (PFNGLENABLEPROC)wglGetProcAddress("glEnable");
     glCreateVertexArrays =
         (PFNGLCREATEVERTEXARRAYSPROC)wglGetProcAddress("glCreateVertexArrays");
     glBindVertexArray =
