@@ -39,7 +39,8 @@ PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 #define WGL_FULL_ACCELERATION_ARB 0x2027
 #define WGL_TYPE_RGBA_ARB 0x202B
 
-input_struct input_state;
+static input_struct input_state;
+static LARGE_INTEGER ticks_per_second, last_tick_count, current_tick_count;
 
 typedef struct win32_backend_handle {
     HINSTANCE instance;
@@ -129,27 +130,14 @@ static LRESULT CALLBACK win32_update_messeges(HWND window, u32 msg, WPARAM w_par
 }
 
 static bool8 update_messages() {
-    INT64 counts_per_sec = 0;
-    QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
-
-    double sec_per_count = 1.0f / 1000.0f;
-
-    INT64 prev_time = 0;
-    QueryPerformanceCounter((LARGE_INTEGER*)&prev_time);
-
     MSG msg;
-    if (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
 
         if (msg.message == WM_QUIT) {
             return false;
         }
-    } else {
-        INT64 current_time = 0;
-        QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
-
-        g_state->app->state.delta_time = (float)((current_time - prev_time) * sec_per_count);
     }
 
     return true;
@@ -280,6 +268,8 @@ window* platform_window_create(window_properties props) {
 
     wglMakeCurrent(backend_handle->device_context, backend_handle->render_context);
 
+    QueryPerformanceFrequency(&ticks_per_second);
+    QueryPerformanceCounter(&last_tick_count);
     return ret;
 }
 
@@ -289,6 +279,18 @@ void platform_window_update(window* wnd) {
     wglSwapIntervalEXT(wnd->props.vsync);
     win32_backend_handle* backend_handle = (win32_backend_handle*)wnd->backend_handle;
     wglSwapLayerBuffers(backend_handle->device_context, WGL_SWAP_MAIN_PLANE);
+
+    QueryPerformanceCounter(&current_tick_count);
+
+    u64 elapsed_ticks = current_tick_count.QuadPart - last_tick_count.QuadPart;
+
+    u64 elapsed_time_micro_secs = (elapsed_ticks * 1000000) / ticks_per_second.QuadPart;
+
+    last_tick_count = current_tick_count;
+
+    g_state->app->state.delta_time = (float)elapsed_time_micro_secs / 1000.0f;
+
+    g_state->app->state.delta_time /= 1000.0f;
 }
 
 bool8 platform_window_close_requested(window* wnd) {

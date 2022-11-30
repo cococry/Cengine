@@ -19,7 +19,7 @@ typedef struct application {
     vertex_array* va;
     shader_program* shader;
     texture2d* texture;
-    vector3 cam_pos;
+    vector3 block_pos;
 } application;
 
 application* application_create(window_properties props);
