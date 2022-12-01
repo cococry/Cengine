@@ -2,6 +2,8 @@
 
 #include "../platform/opengl/gl_functions.h"
 
+#include "../core/logging.h"
+
 #include <stdlib.h>
 
 #define MAX_VERTEX_BUFFERS 32
@@ -13,6 +15,7 @@ vertex_array* vertex_array_create() {
     ret->_vertex_attribute_offset = 0;
     glCreateVertexArrays(1, &ret->id);
     glBindBuffer(GL_ARRAY_BUFFER, ret->id);
+    ASSERT_MSG(ret != nullptr, "Failed to create vertex array.");
     return ret;
 }
 

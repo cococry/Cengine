@@ -3,20 +3,19 @@
 #include "global_state.h"
 
 #include <stdlib.h>
+#include <time.h>
 
 #include "logging.h"
 
 #include "../renderer/render_command.h"
 #include "../renderer/render_defines.h"
 #include "../renderer/renderer2d.h"
+#include "../renderer/asset_pool.h"
 
 #include "../platform/opengl/gl_functions.h"
 
 #include "../math/matrix.h"
 #include "../math/radians.h"
-
-static quad s_quad;
-static quad s_quad2;
 
 static void close_callback(void* data) {
     application* app = (application*)data;
@@ -27,16 +26,13 @@ static void resize_callback(void* data) {
     u32* size = (u32*)data;
     u32 width = size[0];
     u32 height = size[1];
-    g_state->app->wnd->props.width = width;
 
     render_command_resize_viewport(width, height);
     shader_program_bind(g_state->app->shader);
-
-    shader_program_upload_mat4(g_state->app->shader, "u_proj",
-                               orthographic_matrix(0.0f, 1280.0f, 0.0f, 720.0f));
 }
 
 application* application_create(window_properties props) {
+    srand(time(0));
     application* ret = malloc(sizeof(application));
     ret->wnd = platform_window_create(props);
 
@@ -55,19 +51,31 @@ application* application_create(window_properties props) {
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;
 
+    asset_pool_init();
     renderer2d_init();
 
-    s_quad = quad_create("Quad1", vector2_create(300.0f, 300.0f),
-                         vector2_create(100.0f, 100.0f), 0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
-                         "../engine/assets/textures/grass.jpg");
+    quad* player = quad_create("Player", vector2_create(200.0f, 200.0f), vector2_create(100.0f, 100.0f),
+                               0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
+    quad_load_texture(player, "../engine/assets/textures/player.png");
 
-    s_quad2 = quad_create("Quad2", vector2_create(300.0f, 400.0f),
-                          vector2_create(100.0f, 100.0f), 0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
-                          "../engine/assets/textures/player.png");
+    for (u32 x = 0; x < 55; x++) {
+        triangle* spike = triangle_create("SpikeBlue", vector2_create(25.0f + x * 50.0f, 0.0f + 50.0f), vector2_create(50.0f, 50.0f),
+                                          0.0f, vector2_create(-0.5f, -0.5f),
+                                          vector2_create(0.0f, 0.5f), vector2_create(0.5f, -0.5f), vector4_create(0.2f, 0.3f, 0.8f, 1.0f));
+        renderer2d_add_triangle(spike);
+    }
+    for (u32 x = 0; x < 55; x++) {
+        triangle* spike = triangle_create("SpikeRed", vector2_create(25.0f + x * 50.0f, 1390.0f), vector2_create(50.0f, 50.0f),
+                                          0.0f, vector2_create(-0.5f, 0.5f),
+                                          vector2_create(0.0f, -0.5f), vector2_create(0.5f, 0.5f), vector4_create(0.8f, 0.3f, 0.2f, 1.0f));
+        renderer2d_add_triangle(spike);
+    }
 
-    renderer2d_add_quad(&s_quad);
-    renderer2d_add_quad(&s_quad2);
-
+    quad* background = quad_create("Background", vector2_create(50.0f, 50.0f), vector2_create(1280.0f, 720.0f), 0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
+    quad_load_texture(background, "../engine/assets/textures/background.jpg");
+    renderer2d_add_quad(background);
+    
+    renderer2d_add_quad(player);
     return ret;
 }
 
@@ -78,19 +86,19 @@ void application_run(application* app) {
         if (platform_is_key_down(KEY_ESCAPE)) {
             application_stop(app);
         }
-        quad* quad2 = renderer2d_get_quad_by_tag("Quad2");
-        if (quad2 != nullptr) {
-            if (platform_is_key_down(KEY_A) && quad2->position.x > 0.0f + (quad2->scale.x / 2.0f)) {
-                quad_move_x(quad2, -2.5f);
+        quad* player = renderer2d_get_quad_by_tag("Player");
+        if (player != nullptr) {
+            if (platform_is_key_down(KEY_A) && player->position.x > 0.0f + (player->scale.x / 2.0f)) {
+                quad_move_x(player, -2.5f);
             }
-            if (platform_is_key_down(KEY_D) && quad2->position.x < app->wnd->props.width - (quad2->scale.x / 2.0f)) {
-                quad_move_x(quad2, 2.5f);
+            if (platform_is_key_down(KEY_D) && player->position.x < app->wnd->props.width - (player->scale.x / 2.0f)) {
+                quad_move_x(player, 2.5f);
             }
-            if (platform_is_key_down(KEY_S) && quad2->position.y > 0.0f + (quad2->scale.y / 2.0f)) {
-                quad_move_y(quad2, -2.5f);
+            if (platform_is_key_down(KEY_S) && player->position.y > 0.0f + (player->scale.y / 2.0f)) {
+                quad_move_y(player, -2.5f);
             }
-            if (platform_is_key_down(KEY_W) && quad2->position.y < app->wnd->props.height - (quad2->scale.y / 2.0f)) {
-                quad_move_y(quad2, 2.5f);
+            if (platform_is_key_down(KEY_W) && player->position.y < app->wnd->props.height - (player->scale.y / 2.0f)) {
+                quad_move_y(player, 2.5f);
             }
         }
 
@@ -99,7 +107,7 @@ void application_run(application* app) {
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
 
-        renderer2d_render_quads();
+        renderer2d_render_objects();
 
         platform_input_update();
     }

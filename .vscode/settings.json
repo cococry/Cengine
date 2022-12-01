@@ -76,7 +76,11 @@
         "matrix.h": "c",
         "matrix2.h": "c",
         "stb_image.h": "c",
-        "vertex_array.h": "c"
+        "vertex_array.h": "c",
+        "quad2d.h": "c",
+        "asset_pool.h": "c",
+        "render_buffers.h": "c",
+        "renderer2d.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

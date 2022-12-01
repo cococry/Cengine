@@ -13,6 +13,8 @@
 #include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
 
+#include "../renderer/renderer2d.h"
+
 typedef BOOL(WINAPI* PFNWGLCHOOSEPIXELFORMATARBPROC)(HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
 typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
 typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
@@ -169,7 +171,7 @@ window* platform_window_create(window_properties props) {
     backend_handle->instance = GetModuleHandleA(0);
 
     HICON icon = LoadIcon(backend_handle->instance, IDI_APPLICATION);
-    WNDCLASSA window_class;
+    WNDCLASSA window_class = {};
     window_class.style = CBN_DBLCLK;
     window_class.lpfnWndProc = win32_update_messeges;
     window_class.cbWndExtra = 0;

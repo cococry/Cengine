@@ -44,7 +44,9 @@ void shader_program_upload_vec3(shader_program* program, const char* uniform_nam
 }
 
 void shader_program_upload_vec4(shader_program* program, const char* uniform_name, vector4 uniform_value) {
-    glUniform4fv(glGetUniformLocation(program->id, uniform_name), 1, vector4_value_ptr(uniform_value));
+    float* value = vector4_value_ptr(uniform_value);
+    glUniform4fv(glGetUniformLocation(program->id, uniform_name), 1, value);
+    free(value);
 }
 
 void shader_program_upload_int(shader_program* program, const char* uniform_name, i32 uniform_value) {
@@ -52,7 +54,9 @@ void shader_program_upload_int(shader_program* program, const char* uniform_name
 }
 
 void shader_program_upload_mat4(shader_program* program, const char* uniform_name, matrix4 uniform_value) {
-    glUniformMatrix4fv(glGetUniformLocation(program->id, uniform_name), 1, GL_FALSE, matrix4_value_ptr(uniform_value));
+    float* value = matrix4_value_ptr(uniform_value);
+    glUniformMatrix4fv(glGetUniformLocation(program->id, uniform_name), 1, GL_FALSE, value);
+    free(value);
 }
 
 void shader_program_upload_float(shader_program* program, const char* uniform_name, float uniform_value) {

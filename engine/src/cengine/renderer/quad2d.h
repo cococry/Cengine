@@ -18,7 +18,9 @@ typedef struct quad {
 
 } quad;
 
-quad quad_create(const char* tag, vector2 position, vector2 scale, float rotation, vector4 color, const char* texture_filepath);
+quad* quad_create(const char* tag, vector2 position, vector2 scale, float rotation, vector4 color);
+
+void quad_load_texture(quad* quad, const char* texture_filepath);
 
 void quad_delete(quad* quad);
 

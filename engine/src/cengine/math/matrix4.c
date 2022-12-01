@@ -164,6 +164,9 @@ vector4 matrix4_get_column(matrix4 m, u32 index) {
     u32 w_index = VECTOR4_ELEMENT_COUNT * 3 + index_r;
     vector4 ret = vector4_create(matrix_values[x_index], matrix_values[y_index],
                                  matrix_values[z_index], matrix_values[w_index]);
+
+    free(matrix_values);
+
     return ret;
 }
 
@@ -178,6 +181,9 @@ vector4 matrix4_get_row(matrix4 m, u32 index) {
     u32 w_index = 3 + (index_r * VECTOR4_ELEMENT_COUNT);
     vector4 ret = vector4_create(matrix_values[x_index], matrix_values[y_index],
                                  matrix_values[z_index], matrix_values[w_index]);
+
+    free(matrix_values);
+
     return ret;
 }
 
