@@ -82,7 +82,8 @@
         "render_buffers.h": "c",
         "renderer2d.h": "c",
         "algorithm": "c",
-        "texture2d.h": "c"
+        "texture2d.h": "c",
+        "msxml.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

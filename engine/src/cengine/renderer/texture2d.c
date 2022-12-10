@@ -35,6 +35,7 @@ texture2d* texture2d_create(const char* filepath) {
 
     ret->internal_format = internal_format;
     ret->data_format = data_format;
+    ret->number_of_channels = number_of_channels;
 
     ASSERT_MSG(internal_format & data_format, "Texture uses a unsupported format.");
 
@@ -86,5 +87,4 @@ void texture2d_unbind(texture2d* texture) {
 
 void texture2d_delete(texture2d* texture) {
     glDeleteTextures(1, &texture->id);
-    free(texture);
 }

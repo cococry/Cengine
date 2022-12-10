@@ -74,8 +74,6 @@ void quad_set_sprite_animation(quad* quad, sprite_animation anim, bool8 delete_l
 
 void quad_delete(quad* quad) {
     vertex_array_delete(quad->va);
-    if (quad->texture != nullptr)
-        texture2d_delete(quad->texture);
     free(quad);
 }
 

@@ -22,7 +22,4 @@ void main() {
     
     o_color = color;
 
-    if(color.a == 0.0) {
-        discard;
-    }
 }
