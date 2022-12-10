@@ -3,8 +3,11 @@
 #include "../core/defines.h"
 
 #include "vertex_array.h"
-#include "texture.h"
+#include "texture2d.h"
 #include "../math/vector.h"
+
+typedef struct triangle triangle;
+typedef void (*triangle_update_callback)(triangle*);
 
 typedef struct triangle {
     const char* tag;
@@ -18,6 +21,9 @@ typedef struct triangle {
     vertex_array* va;
 
     texture2d* texture;
+
+    triangle_update_callback update_callback;
+
 } triangle;
 
 triangle* triangle_create(const char* tag, vector2 position, vector2 scale, float rotation, vector2 vert1,
@@ -32,3 +38,5 @@ void triangle_render(triangle obj);
 void triangle_move_x(triangle* obj, float x);
 
 void triangle_move_y(triangle* obj, float y);
+
+void default_triangle_update_callback(triangle* this);

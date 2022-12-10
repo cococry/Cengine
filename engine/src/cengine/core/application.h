@@ -4,7 +4,7 @@
 #include "../platform/platform.h"
 #include "../renderer/vertex_array.h"
 #include "../renderer/shader.h"
-#include "../renderer/texture.h"
+#include "../renderer/texture2d.h"
 
 #include "../math/vector.h"
 

@@ -7,6 +7,7 @@ PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLCREATEBUFFERSPROC glCreateBuffers;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBUFFERDATAPROC glBufferData;
+PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
@@ -67,6 +68,8 @@ void load_gl_functions() {
         (PFNGLCREATEBUFFERSPROC)wglGetProcAddress("glCreateBuffers");
     glBufferData =
         (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+    glBufferSubData =
+        (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
     glDeleteBuffers =
         (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
     glCreateProgram =

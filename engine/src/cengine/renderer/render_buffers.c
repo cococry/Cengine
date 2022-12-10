@@ -40,6 +40,17 @@ vertex_buffer* vertex_buffer_create(float* data, u32 size, u32 draw_mode, u32 ve
 
     return ret;
 }
+vertex_buffer* vertex_buffer_create_empty(u32 size, u32 vertex_attrib_count) {
+    vertex_buffer* ret = malloc(sizeof(vertex_buffer));
+    ret->layout_attributes = malloc(sizeof(vertex_layout_attribute) * vertex_attrib_count);
+    ret->layout_attribute_capacity = vertex_attrib_count;
+    ret->layout_attribute_count = 0;
+    glCreateBuffers(1, &ret->id);
+    glBindBuffer(GL_ARRAY_BUFFER, ret->id);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+
+    return ret;
+}
 
 void vertex_buffer_bind(vertex_buffer* buffer) {
     glBindBuffer(GL_ARRAY_BUFFER, buffer->id);
@@ -60,6 +71,11 @@ void vertex_buffer_add_layout_attribute(vertex_buffer* buffer, vertex_layout_att
     ASSERT_MSG(buffer->layout_attribute_count < buffer->layout_attribute_capacity, "Vertex layout attribute index out of bounds.");
 
     buffer->layout_attributes[buffer->layout_attribute_count++] = attribute;
+}
+
+void vertex_buffer_set_data(vertex_buffer* buffer, float* data, u32 size, u32 offset) {
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->id);
+    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
 
 index_buffer* index_buffer_create(u32* data, u32 count, u32 draw_mode) {

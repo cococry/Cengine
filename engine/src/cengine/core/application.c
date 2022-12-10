@@ -17,6 +17,8 @@
 #include "../math/matrix.h"
 #include "../math/radians.h"
 
+#include "../game/game.h"
+
 static void close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
@@ -53,29 +55,8 @@ application* application_create(window_properties props) {
 
     asset_pool_init();
     renderer2d_init();
+    game_init();
 
-    quad* player = quad_create("Player", vector2_create(200.0f, 200.0f), vector2_create(100.0f, 100.0f),
-                               0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
-    quad_load_texture(player, "../engine/assets/textures/player.png");
-
-    for (u32 x = 0; x < 55; x++) {
-        triangle* spike = triangle_create("SpikeBlue", vector2_create(25.0f + x * 50.0f, 0.0f + 50.0f), vector2_create(50.0f, 50.0f),
-                                          0.0f, vector2_create(-0.5f, -0.5f),
-                                          vector2_create(0.0f, 0.5f), vector2_create(0.5f, -0.5f), vector4_create(0.2f, 0.3f, 0.8f, 1.0f));
-        renderer2d_add_triangle(spike);
-    }
-    for (u32 x = 0; x < 55; x++) {
-        triangle* spike = triangle_create("SpikeRed", vector2_create(25.0f + x * 50.0f, 1390.0f), vector2_create(50.0f, 50.0f),
-                                          0.0f, vector2_create(-0.5f, 0.5f),
-                                          vector2_create(0.0f, -0.5f), vector2_create(0.5f, 0.5f), vector4_create(0.8f, 0.3f, 0.2f, 1.0f));
-        renderer2d_add_triangle(spike);
-    }
-
-    quad* background = quad_create("Background", vector2_create(50.0f, 50.0f), vector2_create(1280.0f, 720.0f), 0.0f, vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
-    quad_load_texture(background, "../engine/assets/textures/background.jpg");
-    renderer2d_add_quad(background);
-    
-    renderer2d_add_quad(player);
     return ret;
 }
 
@@ -86,27 +67,13 @@ void application_run(application* app) {
         if (platform_is_key_down(KEY_ESCAPE)) {
             application_stop(app);
         }
-        quad* player = renderer2d_get_quad_by_tag("Player");
-        if (player != nullptr) {
-            if (platform_is_key_down(KEY_A) && player->position.x > 0.0f + (player->scale.x / 2.0f)) {
-                quad_move_x(player, -2.5f);
-            }
-            if (platform_is_key_down(KEY_D) && player->position.x < app->wnd->props.width - (player->scale.x / 2.0f)) {
-                quad_move_x(player, 2.5f);
-            }
-            if (platform_is_key_down(KEY_S) && player->position.y > 0.0f + (player->scale.y / 2.0f)) {
-                quad_move_y(player, -2.5f);
-            }
-            if (platform_is_key_down(KEY_W) && player->position.y < app->wnd->props.height - (player->scale.y / 2.0f)) {
-                quad_move_y(player, 2.5f);
-            }
-        }
 
         platform_window_update(app->wnd);
 
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
 
+        renderer2d_update_objects();
         renderer2d_render_objects();
 
         platform_input_update();
@@ -119,6 +86,7 @@ void application_shutdown(application* app) {
     destroy_listeners(event_listeners, max_events);
     renderer2d_terminate();
     platform_input_shutdown();
+    game_terminate();
     free(g_state);
 }
 

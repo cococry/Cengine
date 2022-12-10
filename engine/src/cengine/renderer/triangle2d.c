@@ -11,6 +11,9 @@
 
 #include <stdlib.h>
 
+void default_triangle_update_callback(triangle* this) {
+}
+
 triangle* triangle_create(const char* tag, vector2 position, vector2 scale, float rotation, vector2 vert1,
                           vector2 vert2, vector2 vert3, vector4 color) {
     triangle* ret = malloc(sizeof(triangle));
@@ -21,6 +24,7 @@ triangle* triangle_create(const char* tag, vector2 position, vector2 scale, floa
     ret->rotation = rotation;
     ret->color = color;
     ret->texture = nullptr;
+    ret->update_callback = default_triangle_update_callback;
 
     float vertices[] = {
         vert1.x,

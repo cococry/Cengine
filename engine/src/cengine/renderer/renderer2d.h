@@ -20,6 +20,8 @@ void renderer2d_remove_quad(quad* obj);
 
 void renderer2d_render_objects();
 
+void renderer2d_update_objects();
+
 i32 renderer2d_get_quad_index(quad* obj);
 
 quad* renderer2d_get_quad_by_tag(const char* tag);

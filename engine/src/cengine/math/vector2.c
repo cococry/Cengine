@@ -121,7 +121,7 @@ bool8 vector2_perpendicular(vector2 v1, vector2 v2) {
 }
 
 bool8 vector2_compare(vector2 v1, vector2 v2) {
-    return v1.x == v2.y && v1.y == v2.y;
+    return v1.x == v2.x && v1.y == v2.y;
 }
 
 vector2 vector2_normalized(vector2 v) {

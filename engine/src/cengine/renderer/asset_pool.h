@@ -2,7 +2,7 @@
 
 #include "../core/defines.h"
 
-#include "texture.h"
+#include "texture2d.h"
 
 typedef struct asset_pool_state {
     texture2d** textures;

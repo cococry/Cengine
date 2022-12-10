@@ -29,8 +29,6 @@ void renderer2d_init() {
     shader_program_bind(g_state->app->shader);
     shader_program_upload_mat4(g_state->app->shader, "u_proj",
                                orthographic_matrix(0.0f, 1280.0f, 0.0f, 720.0f));
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void renderer2d_terminate() {
@@ -62,7 +60,7 @@ void renderer2d_render_objects() {
     if (s_state.quad_count != 0) {
         for (u32 i = 0; i < s_state.quad_count; i++) {
             if (s_state.quads[i] != nullptr) {
-                quad_render(*s_state.quads[i]);
+                quad_render(s_state.quads[i]);
             }
         }
     }
@@ -71,6 +69,19 @@ void renderer2d_render_objects() {
             if (s_state.triangles[i] != nullptr) {
                 triangle_render(*s_state.triangles[i]);
             }
+        }
+    }
+}
+
+void renderer2d_update_objects() {
+    for (u32 i = 0; i < s_state.quad_count; i++) {
+        if (s_state.quads[i]->update_callback != default_quad_update_callback)
+            s_state.quads[i]->update_callback(s_state.quads[i]);
+    }
+    if (s_state.triangle_count != 0) {
+        for (u32 i = 0; i < s_state.triangle_count; i++) {
+            if (s_state.triangles[i]->update_callback != default_triangle_update_callback)
+                s_state.triangles[i]->update_callback(s_state.triangles[i]);
         }
     }
 }

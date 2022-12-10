@@ -80,7 +80,9 @@
         "quad2d.h": "c",
         "asset_pool.h": "c",
         "render_buffers.h": "c",
-        "renderer2d.h": "c"
+        "renderer2d.h": "c",
+        "algorithm": "c",
+        "texture2d.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }
