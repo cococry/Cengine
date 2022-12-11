@@ -70,7 +70,7 @@ void application_run(application* app) {
         platform_window_update(app->wnd);
 
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
-        render_command_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
+        render_command_clear_color(RGB_COLOR(69, 69, 68), 1.0f);
 
         renderer2d_update_objects();
         renderer2d_render_objects();

@@ -4,6 +4,9 @@
 #define true 1
 #define nullptr (void*)0
 
+#define RGB_COLOR(r, g, b) r / 255.0f, g / 255.0f, b / 255.0f
+#define RGBA_COLOR(r, g, b, a) r / 255.0f, g / 255.0f, b / 255.0f a / 255.0f
+
 typedef unsigned char bool8;
 typedef unsigned int bool32;
 
