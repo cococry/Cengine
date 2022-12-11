@@ -8,4 +8,5 @@ typedef struct game_state {
 } game_state;
 
 void game_init();
+void game_update();
 void game_terminate();

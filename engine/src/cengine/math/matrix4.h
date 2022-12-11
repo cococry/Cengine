@@ -55,3 +55,5 @@ void matrix4_divm(matrix4* source, matrix4 m);
 matrix4 matrix4_transpose(matrix4 m);
 
 void matrix4_log(matrix4 m);
+
+matrix4 matrix4_inverse(matrix4 m);

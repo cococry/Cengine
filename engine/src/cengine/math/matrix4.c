@@ -269,3 +269,79 @@ void matrix4_log(matrix4 m) {
     vector4_log(m.row4);
     printf(" |\n");
 }
+
+matrix4 matrix4_inverse(matrix4 m) {
+    float Coef00 = m.row3.z * m.row4.w - m.row4.z * m.row3.w;
+    float Coef02 = m.row2.z * m.row4.w - m.row4.z * m.row2.w;
+    float Coef03 = m.row2.z * m.row3.w - m.row3.z * m.row2.w;
+
+    float Coef04 = m.row3.y * m.row4.w - m.row4.y * m.row3.w;
+    float Coef06 = m.row2.y * m.row4.w - m.row4.y * m.row2.w;
+    float Coef07 = m.row2.y * m.row3.w - m.row3.y * m.row2.w;
+
+    float Coef08 = m.row3.y * m.row4.z - m.row4.y * m.row3.z;
+    float Coef10 = m.row2.y * m.row4.z - m.row4.y * m.row2.z;
+    float Coef11 = m.row2.y * m.row3.z - m.row3.y * m.row2.z;
+
+    float Coef12 = m.row3.x * m.row4.w - m.row4.x * m.row3.w;
+    float Coef14 = m.row2.x * m.row4.w - m.row4.x * m.row2.w;
+    float Coef15 = m.row2.x * m.row3.w - m.row3.x * m.row2.w;
+
+    float Coef16 = m.row3.x * m.row4.z - m.row4.x * m.row3.z;
+    float Coef18 = m.row2.x * m.row4.z - m.row4.x * m.row2.z;
+    float Coef19 = m.row2.x * m.row3.z - m.row3.x * m.row2.z;
+
+    float Coef20 = m.row3.x * m.row4.y - m.row4.x * m.row3.y;
+    float Coef22 = m.row2.x * m.row4.y - m.row4.x * m.row2.y;
+    float Coef23 = m.row2.x * m.row3.y - m.row3.x * m.row2.y;
+
+    vector4 Fac0 = vector4_create(Coef00, Coef00, Coef02, Coef03);
+    vector4 Fac1 = vector4_create(Coef04, Coef04, Coef06, Coef07);
+    vector4 Fac2 = vector4_create(Coef08, Coef08, Coef10, Coef11);
+    vector4 Fac3 = vector4_create(Coef12, Coef12, Coef14, Coef15);
+    vector4 Fac4 = vector4_create(Coef16, Coef16, Coef18, Coef19);
+    vector4 Fac5 = vector4_create(Coef20, Coef20, Coef22, Coef23);
+
+    vector4 Vec0 = vector4_create(m.row2.x, m.row1.x, m.row1.x, m.row1.x);
+    vector4 Vec1 = vector4_create(m.row2.y, m.row1.y, m.row1.y, m.row1.y);
+    vector4 Vec2 = vector4_create(m.row2.z, m.row1.z, m.row1.z, m.row1.z);
+    vector4 Vec3 = vector4_create(m.row2.w, m.row1.w, m.row1.w, m.row1.w);
+
+    vector4 Inv0 = vector4_subtraction(
+        vector4_multiply(Vec1, Fac0),
+        vector4_additition(
+            vector4_multiply(Vec2, Fac1),
+            vector4_multiply(Vec3, Fac2)));
+    vector4 Inv1 = vector4_subtraction(
+        vector4_multiply(Vec0, Fac0),
+        vector4_additition(
+            vector4_multiply(Vec2, Fac3),
+            vector4_multiply(Vec3, Fac4)));
+    vector4 Inv2 = vector4_subtraction(
+        vector4_multiply(Vec0, Fac1),
+        vector4_additition(
+            vector4_multiply(Vec1, Fac3),
+            vector4_multiply(Vec3, Fac5)));
+    vector4 Inv3 = vector4_subtraction(
+        vector4_multiply(Vec0, Fac2),
+        vector4_additition(
+            vector4_multiply(Vec1, Fac4),
+            vector4_multiply(Vec2, Fac5)));
+
+    vector4 SignA = vector4_create(+1, -1, +1, -1);
+    vector4 SignB = vector4_create(-1, +1, -1, +1);
+    matrix4 Inverse = matrix4_create(
+        vector4_multiply(Inv0, SignA),
+        vector4_multiply(Inv1, SignB),
+        vector4_multiply(Inv2, SignA),
+        vector4_multiply(Inv3, SignB));
+
+    vector4 Row0 = vector4_create(Inverse.row1.x, Inverse.row2.x, Inverse.row3.x, Inverse.row4.x);
+
+    vector4 Dot0 = vector4_multiply(m.row1, Row0);
+    float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+    float OneOverDeterminant = 1 / Dot1;
+
+    return matrix4_scaler_mul(Inverse, OneOverDeterminant);
+}

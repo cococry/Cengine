@@ -30,7 +30,6 @@ static void resize_callback(void* data) {
     u32 height = size[1];
 
     render_command_resize_viewport(width, height);
-    shader_program_bind(g_state->app->shader);
 }
 
 application* application_create(window_properties props) {
@@ -75,6 +74,8 @@ void application_run(application* app) {
 
         renderer2d_update_objects();
         renderer2d_render_objects();
+
+        game_update();
 
         platform_input_update();
     }

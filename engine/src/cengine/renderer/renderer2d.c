@@ -28,7 +28,8 @@ void renderer2d_init() {
 
     shader_program_bind(g_state->app->shader);
     shader_program_upload_mat4(g_state->app->shader, "u_proj",
-                               orthographic_matrix(0.0f, 1280.0f, 0.0f, 720.0f));
+                               orthographic_matrix(0.0f, 1280.0f, 0.0f,
+                                                   720.0f));
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
