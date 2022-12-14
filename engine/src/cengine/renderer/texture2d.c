@@ -88,3 +88,7 @@ void texture2d_unbind(texture2d* texture) {
 void texture2d_delete(texture2d* texture) {
     glDeleteTextures(1, &texture->id);
 }
+
+bool8 texture2d_compare(texture2d* texture1, texture2d* texture2) {
+    return texture1->id == texture2->id;
+}

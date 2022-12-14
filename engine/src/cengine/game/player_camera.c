@@ -22,15 +22,13 @@ void player_camera_update(player_camera* camera) {
     shader_program_upload_mat4(g_state->app->shader, "u_view", camera->view_matrix);
 
     if (platform_is_key_down(KEY_A)) {
-        camera->position.x -= 2.5f * g_state->app->wnd->props.width / 10.0f * g_state->app->state.delta_time;
-    }
-    if (platform_is_key_down(KEY_D)) {
-        camera->position.x += 2.5f * g_state->app->wnd->props.width / 10.0f * g_state->app->state.delta_time;
+        camera->position.x -= 2.5f * 100.0f * g_state->app->state.delta_time;
+    } else if (platform_is_key_down(KEY_D)) {
+        camera->position.x += 2.5f * 100.0f * g_state->app->state.delta_time;
     }
     if (platform_is_key_down(KEY_W)) {
-        camera->position.y += 2.5f * g_state->app->wnd->props.width / 10.0f * g_state->app->state.delta_time;
-    }
-    if (platform_is_key_down(KEY_S)) {
-        camera->position.y -= 2.5f * g_state->app->wnd->props.width / 10.0f * g_state->app->state.delta_time;
+        camera->position.y += 2.5f * 100.0f * g_state->app->state.delta_time;
+    } else if (platform_is_key_down(KEY_S)) {
+        camera->position.y -= 2.5f * 100.0f * g_state->app->state.delta_time;
     }
 }

@@ -35,3 +35,5 @@ void renderer2d_remove_triangle(triangle* obj);
 i32 renderer2d_get_triangle_index(triangle* obj);
 
 triangle* renderer2d_get_triangle_by_tag(const char* tag);
+
+void _renderer2d_sort_quads();

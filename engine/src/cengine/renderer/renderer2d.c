@@ -6,6 +6,7 @@
 #include "../platform/opengl/ext/glcorearb.h"
 
 #include "../platform/opengl/gl_functions.h"
+#include "../core/event_system.h"
 
 #include <Windows.h>
 
@@ -17,6 +18,8 @@ static renderer2d_state s_state;
 
 #define MAX_QUADS 10000
 #define MAX_TRIANGLES 2500
+
+static bool8 quads_dirty = false;
 
 void renderer2d_init() {
     s_state.quads = malloc(sizeof(quad) * MAX_QUADS);
@@ -49,6 +52,7 @@ void renderer2d_terminate() {
 
 void renderer2d_add_quad(quad* obj) {
     s_state.quads[s_state.quad_count++] = obj;
+    quads_dirty = true;
 }
 
 void renderer2d_remove_quad(quad* obj) {
@@ -60,6 +64,10 @@ void renderer2d_remove_quad(quad* obj) {
 }
 
 void renderer2d_render_objects() {
+    if (quads_dirty) {
+        _renderer2d_sort_quads();
+        quads_dirty = false;
+    }
     shader_program_bind(g_state->app->shader);
     if (s_state.quad_count != 0) {
         for (u32 i = 0; i < s_state.quad_count; i++) {
@@ -79,8 +87,18 @@ void renderer2d_render_objects() {
 
 void renderer2d_update_objects() {
     for (u32 i = 0; i < s_state.quad_count; i++) {
+        vector2 tmp_pos = s_state.quads[i]->position;
+        vector2 tmp_movement = s_state.quads[i]->movement;
         if (s_state.quads[i]->update_callback != default_quad_update_callback)
             s_state.quads[i]->update_callback(s_state.quads[i]);
+
+        if (vector2_compare(tmp_pos, s_state.quads[i]->position)) {
+            s_state.quads[i]->movement = vector2_create(0.0f, 0.0f);
+        }
+
+        if (!vector2_compare(tmp_movement, s_state.quads[i]->movement)) {
+            dispatch_event(quad_moved_event, s_state.quads[i]);
+        }
     }
     if (s_state.triangle_count != 0) {
         for (u32 i = 0; i < s_state.triangle_count; i++) {
@@ -139,4 +157,16 @@ triangle* renderer2d_get_triangle_by_tag(const char* tag) {
         }
     }
     return nullptr;
+}
+
+void _renderer2d_sort_quads() {
+    for (u32 i = 0; i < s_state.quad_count; i++) {
+        for (u32 j = i + 1; j < s_state.quad_count; j++) {
+            if (s_state.quads[i]->render_level > s_state.quads[j]->render_level) {
+                quad* tmp = s_state.quads[i];
+                s_state.quads[i] = s_state.quads[j];
+                s_state.quads[j] = tmp;
+            }
+        }
+    }
 }
