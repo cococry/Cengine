@@ -47,15 +47,15 @@ triangle* triangle_create(const char* tag, vector2 position, vector2 scale, floa
 
     ret->va = vertex_array_create();
 
-    vertex_buffer* vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 2);
+    vertex_buffer vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 2);
 
-    vertex_buffer_add_layout_attribute(vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
-    vertex_buffer_add_layout_attribute(vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
+    vertex_buffer_add_layout_attribute(&vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
+    vertex_buffer_add_layout_attribute(&vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
 
-    index_buffer* ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
+    index_buffer ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
 
-    vertex_array_add_vertex_buffer(ret->va, vb);
-    vertex_array_set_index_buffer(ret->va, ib);
+    vertex_array_add_vertex_buffer(&ret->va, vb);
+    vertex_array_set_index_buffer(&ret->va, ib);
 
     return ret;
 }
@@ -66,7 +66,7 @@ void triangle_load_texture(triangle* obj, const char* texture_filepath) {
 }
 
 void triangle_delete(triangle* obj) {
-    vertex_array_delete(obj->va);
+    vertex_array_delete(&obj->va);
     free(obj);
 }
 
@@ -87,9 +87,7 @@ void triangle_render(triangle obj) {
     shader_program_upload_vec4(g_state->app->shader, "u_color", obj.color);
     shader_program_upload_mat4(g_state->app->shader, "u_model", model_matrix);
 
-    if (obj.va) {
-        render_command_draw_indexed(obj.va);
-    }
+    render_command_draw_indexed(&obj.va);
 }
 
 void triangle_move_x(triangle* obj, float x) {

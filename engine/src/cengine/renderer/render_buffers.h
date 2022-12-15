@@ -29,9 +29,9 @@ typedef struct index_buffer {
     render_id id;
 } index_buffer;
 
-vertex_buffer* vertex_buffer_create(float* data, u32 size, u32 draw_mode, u32 vertex_attrib_count);
+vertex_buffer vertex_buffer_create(float* data, u32 size, u32 draw_mode, u32 vertex_attrib_count);
 
-vertex_buffer* vertex_buffer_create_empty(u32 size, u32 vertex_attrib_count);
+vertex_buffer vertex_buffer_create_empty(u32 size, u32 vertex_attrib_count);
 
 void vertex_buffer_bind(vertex_buffer* buffer);
 
@@ -43,7 +43,7 @@ void vertex_buffer_add_layout_attribute(vertex_buffer* buffer, vertex_layout_att
 
 void vertex_buffer_set_data(vertex_buffer* buffer, float* data, u32 size, u32 offset);
 
-index_buffer* index_buffer_create(u32* data, u32 count, u32 draw_mode);
+index_buffer index_buffer_create(u32* data, u32 count, u32 draw_mode);
 
 void index_buffer_bind(index_buffer* buffer);
 

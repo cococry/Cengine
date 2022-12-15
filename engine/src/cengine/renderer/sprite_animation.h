@@ -24,4 +24,6 @@ void sprite_animation_set_anim_by_values(sprite_animation* anim, vector2* anim_c
 void sprite_animation_set_anim_contiguous_x(sprite_animation* anim, u32 first_x, u32 last_x, u32 y);
 void sprite_animation_set_anim_contiguous_y(sprite_animation* anim, u32 first_y, u32 last_y, u32 x);
 
+void sprite_aimation_set_tick_speed(sprite_animation* anim, float tick_speed);
+
 void sprite_animation_tick(quad* obj);

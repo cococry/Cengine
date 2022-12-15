@@ -21,8 +21,8 @@ typedef struct quad {
 
     vector4 color;
 
-    vertex_array* va;
-    vertex_buffer* vb;
+    vertex_array va;
+    vertex_buffer vb;
     texture2d* texture;
 
     u32 render_level;

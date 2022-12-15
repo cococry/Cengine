@@ -17,8 +17,6 @@
 #include "../math/matrix.h"
 #include "../math/radians.h"
 
-#include "../game/game.h"
-
 static void close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
@@ -32,7 +30,14 @@ static void resize_callback(void* data) {
     render_command_resize_viewport(width, height);
 }
 
-application* application_create(window_properties props) {
+game_callbacks game_callbacks_create() {
+    game_callbacks ret;
+    ret.game_init_cb = nullptr;
+    ret.game_update_cb = nullptr;
+    ret.game_terminate_cb = nullptr;
+    return ret;
+}
+application* application_create(window_properties props, game_callbacks game_cbs) {
     srand(time(0));
     application* ret = malloc(sizeof(application));
     ret->wnd = platform_window_create(props);
@@ -48,13 +53,15 @@ application* application_create(window_properties props) {
     platform_input_init();
 
     ret->state.delta_time = 0.0f;
+    ret->game_cbs = game_cbs;
 
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;
 
     asset_pool_init();
     renderer2d_init();
-    game_init();
+    if (ret->game_cbs.game_init_cb != nullptr)
+        ret->game_cbs.game_init_cb();
 
     return ret;
 }
@@ -75,7 +82,8 @@ void application_run(application* app) {
         renderer2d_update_objects();
         renderer2d_render_objects();
 
-        game_update();
+        if (app->game_cbs.game_update_cb != nullptr)
+            app->game_cbs.game_update_cb();
 
         platform_input_update();
     }
@@ -87,7 +95,8 @@ void application_shutdown(application* app) {
     destroy_listeners(event_listeners, max_events);
     renderer2d_terminate();
     platform_input_shutdown();
-    game_terminate();
+    if (app->game_cbs.game_terminate_cb != nullptr)
+        app->game_cbs.game_terminate_cb();
     free(g_state);
 }
 

@@ -18,8 +18,7 @@ typedef struct triangle {
     vector2* vertices;
     vector4 color;
 
-    vertex_array* va;
-
+    vertex_array va;
     texture2d* texture;
 
     triangle_update_callback update_callback;

@@ -1,6 +1,6 @@
 @echo off
 
-echo Building Calmar...
+echo Building Cengine...
 
 pushd ..\engine
 call build.bat
@@ -11,7 +11,7 @@ IF %ERRORLEVEL% NEQ 0 (
   echo Failed to build Cengine - Error Code: %ERRORLEVEL% && cd ..\scripts  && pause
 )
 
-pushd ..\testbed
+pushd ..\game
 call build.bat
 popd
 

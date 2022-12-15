@@ -84,7 +84,11 @@
         "algorithm": "c",
         "texture2d.h": "c",
         "msxml.h": "c",
-        "matrix_transform.h": "c"
+        "matrix_transform.h": "c",
+        "game.h": "c",
+        "vector2.h": "c",
+        "vector3.h": "c",
+        "triangle2d.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

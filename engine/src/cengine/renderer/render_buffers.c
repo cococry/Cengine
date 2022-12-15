@@ -29,24 +29,24 @@ vertex_layout_attribute vertex_layout_attribute_create(vertex_layout_attrib_type
     }
     return ret;
 }
-vertex_buffer* vertex_buffer_create(float* data, u32 size, u32 draw_mode, u32 vertex_attrib_count) {
-    vertex_buffer* ret = malloc(sizeof(vertex_buffer));
-    ret->layout_attributes = malloc(sizeof(vertex_layout_attribute) * vertex_attrib_count);
-    ret->layout_attribute_capacity = vertex_attrib_count;
-    ret->layout_attribute_count = 0;
-    glCreateBuffers(1, &ret->id);
-    glBindBuffer(GL_ARRAY_BUFFER, ret->id);
+vertex_buffer vertex_buffer_create(float* data, u32 size, u32 draw_mode, u32 vertex_attrib_count) {
+    vertex_buffer ret;
+    ret.layout_attributes = malloc(sizeof(vertex_layout_attribute) * vertex_attrib_count);
+    ret.layout_attribute_capacity = vertex_attrib_count;
+    ret.layout_attribute_count = 0;
+    glCreateBuffers(1, &ret.id);
+    glBindBuffer(GL_ARRAY_BUFFER, ret.id);
     glBufferData(GL_ARRAY_BUFFER, size, data, draw_mode);
 
     return ret;
 }
-vertex_buffer* vertex_buffer_create_empty(u32 size, u32 vertex_attrib_count) {
-    vertex_buffer* ret = malloc(sizeof(vertex_buffer));
-    ret->layout_attributes = malloc(sizeof(vertex_layout_attribute) * vertex_attrib_count);
-    ret->layout_attribute_capacity = vertex_attrib_count;
-    ret->layout_attribute_count = 0;
-    glCreateBuffers(1, &ret->id);
-    glBindBuffer(GL_ARRAY_BUFFER, ret->id);
+vertex_buffer vertex_buffer_create_empty(u32 size, u32 vertex_attrib_count) {
+    vertex_buffer ret;
+    ret.layout_attributes = malloc(sizeof(vertex_layout_attribute) * vertex_attrib_count);
+    ret.layout_attribute_capacity = vertex_attrib_count;
+    ret.layout_attribute_count = 0;
+    glCreateBuffers(1, &ret.id);
+    glBindBuffer(GL_ARRAY_BUFFER, ret.id);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 
     return ret;
@@ -64,7 +64,6 @@ void vertex_buffer_delete(vertex_buffer* buffer) {
     glDeleteBuffers(1, &buffer->id);
 
     free(buffer->layout_attributes);
-    free(buffer);
 }
 
 void vertex_buffer_add_layout_attribute(vertex_buffer* buffer, vertex_layout_attribute attribute) {
@@ -78,11 +77,11 @@ void vertex_buffer_set_data(vertex_buffer* buffer, float* data, u32 size, u32 of
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
 
-index_buffer* index_buffer_create(u32* data, u32 count, u32 draw_mode) {
-    index_buffer* ret = malloc(sizeof(index_buffer));
-    ret->index_count = count;
-    glCreateBuffers(1, &ret->id);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ret->id);
+index_buffer index_buffer_create(u32* data, u32 count, u32 draw_mode) {
+    index_buffer ret;
+    ret.index_count = count;
+    glCreateBuffers(1, &ret.id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ret.id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(u32), data, draw_mode);
     return ret;
 }
@@ -97,6 +96,4 @@ void index_buffer_unbind(index_buffer* buffer) {
 
 void index_buffer_delete(index_buffer* buffer) {
     glDeleteBuffers(1, &buffer->id);
-
-    free(buffer);
 }

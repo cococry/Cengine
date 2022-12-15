@@ -43,13 +43,13 @@ quad* quad_create(const char* tag, vector2 position, vector2 scale, vector2 hit_
 
     ret->vb = vertex_buffer_create(vertices, sizeof(vertices), CNGN_STATIC_DRAW, 2);
 
-    vertex_buffer_add_layout_attribute(ret->vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
-    vertex_buffer_add_layout_attribute(ret->vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
+    vertex_buffer_add_layout_attribute(&ret->vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
+    vertex_buffer_add_layout_attribute(&ret->vb, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
 
-    index_buffer* ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
+    index_buffer ib = index_buffer_create(indices, 6, CNGN_STATIC_DRAW);
 
-    vertex_array_add_vertex_buffer(ret->va, ret->vb);
-    vertex_array_set_index_buffer(ret->va, ib);
+    vertex_array_add_vertex_buffer(&ret->va, ret->vb);
+    vertex_array_set_index_buffer(&ret->va, ib);
 
     if (subtexture != nullptr) {
         quad_load_texture(ret, subtexture->texture->filepath);
@@ -76,7 +76,7 @@ void quad_set_sprite_animation(quad* quad, sprite_animation anim) {
 }
 
 void quad_delete(quad* quad) {
-    vertex_array_delete(quad->va);
+    vertex_array_delete(&quad->va);
     free(quad);
 }
 
@@ -98,7 +98,7 @@ void quad_render(quad* quad) {
 
     shader_program_upload_vec4(g_state->app->shader, "u_color", quad->color);
     shader_program_upload_mat4(g_state->app->shader, "u_model", model_matrix);
-    render_command_draw_indexed(quad->va);
+    render_command_draw_indexed(&quad->va);
 }
 
 void quad_move_x(quad* quad, float x) {
@@ -120,9 +120,9 @@ void quad_change_texture_coords(quad* quad, subtexture_coords coords) {
         0.5f, 0.5f, 0.0f, coords.max.x, coords.max.y,
         0.5f, -0.5f, 0.0f, coords.max.x, coords.min.y};
 
-    vertex_array_bind(quad->va);
-    vertex_buffer_bind(quad->vb);
-    vertex_buffer_set_data(quad->vb, vertices, sizeof(vertices), 0);
+    vertex_array_bind(&quad->va);
+    vertex_buffer_bind(&quad->vb);
+    vertex_buffer_set_data(&quad->vb, vertices, sizeof(vertices), 0);
 }
 
 bool8 quad_collding_with_quad(quad* quad1, quad* quad2) {

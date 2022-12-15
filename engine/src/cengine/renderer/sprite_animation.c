@@ -94,3 +94,9 @@ void sprite_animation_tick(quad* obj) {
         obj->sprite_anim._anim_timer = 0.0f;
     }
 }
+
+void sprite_aimation_set_tick_speed(sprite_animation* anim, float tick_speed) {
+    anim->tick_speed = tick_speed;
+    anim->_anim_timer = 0.0f;
+    anim->_anim_index = 0;
+}
