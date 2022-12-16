@@ -15,7 +15,7 @@ void default_triangle_update_callback(triangle* this) {
 }
 
 triangle* triangle_create(const char* tag, vector2 position, vector2 scale, float rotation, vector2 vert1,
-                          vector2 vert2, vector2 vert3, vector4 color) {
+                          vector2 vert2, vector2 vert3, vector4 color, u32 render_level) {
     triangle* ret = malloc(sizeof(triangle));
 
     ret->tag = tag;
@@ -25,6 +25,7 @@ triangle* triangle_create(const char* tag, vector2 position, vector2 scale, floa
     ret->color = color;
     ret->texture = nullptr;
     ret->update_callback = default_triangle_update_callback;
+    ret->render_level = render_level;
 
     float vertices[] = {
         vert1.x,
@@ -67,7 +68,6 @@ void triangle_load_texture(triangle* obj, const char* texture_filepath) {
 
 void triangle_delete(triangle* obj) {
     vertex_array_delete(&obj->va);
-    free(obj);
 }
 
 void triangle_render(triangle obj) {

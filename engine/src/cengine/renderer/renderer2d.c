@@ -16,16 +16,11 @@
 
 static renderer2d_state s_state;
 
-#define MAX_QUADS 10000
-#define MAX_TRIANGLES 2500
-
-static bool8 quads_dirty = false;
+#define MAX_SCENE_COUNT 32
 
 void renderer2d_init() {
-    s_state.quads = malloc(sizeof(quad) * MAX_QUADS);
-    s_state.triangles = malloc(sizeof(triangle) * MAX_TRIANGLES);
-    s_state.quad_count = 0;
-    s_state.triangle_count = 0;
+    s_state.scenes = malloc(sizeof(scene) * MAX_SCENE_COUNT);
+    s_state.scene_count = 0;
 
     g_state->app->shader = shader_program_create("../engine/assets/shaders/default_vertex.glsl", "../engine/assets/shaders/default_fragment.glsl");
 
@@ -39,134 +34,85 @@ void renderer2d_init() {
 }
 
 void renderer2d_terminate() {
-    for (u32 i = 0; i < s_state.quad_count; i++) {
-        quad_delete(s_state.quads[i]);
-        s_state.quads[i] = nullptr;
-    }
-    for (u32 i = 0; i < s_state.triangle_count; i++) {
-        triangle_delete(s_state.triangles[i]);
-        s_state.triangles[i] = nullptr;
+    for (u32 i = 0; i < s_state.scene_count; i++) {
+        scene_delete(s_state.scenes[i]);
     }
     shader_program_delete(g_state->app->shader);
 }
 
+void renderer2d_add_scene(scene* scene) {
+    s_state.scenes[s_state.scene_count++] = scene;
+}
+
+void renderer2d_set_active_scene(scene* scene) {
+    s_state.active_scene = scene;
+    s_state.scenes[s_state.scene_count++] = scene;
+}
+
+void renderer2d_switch_active_scene_by_name(const char* name) {
+    if (s_state.active_scene->name == name) {
+        return;
+    }
+    if (strcmp(renderer2d_get_scene_by_name(name)->name, "Invalid") == 0) {
+        return;
+    }
+    s_state.active_scene = renderer2d_get_scene_by_name(name);
+}
+
+scene* renderer2d_get_scene_by_name(const char* name) {
+    for (u32 i = 0; i < s_state.scene_count; i++) {
+        if (s_state.scenes[i]->name == name) {
+            return s_state.scenes[i];
+        }
+    }
+    return scene_create_empty("Invalid");
+}
+
 void renderer2d_add_quad(quad* obj) {
-    s_state.quads[s_state.quad_count++] = obj;
-    quads_dirty = true;
+    scene_add_quad(s_state.active_scene, obj);
 }
 
 void renderer2d_remove_quad(quad* obj) {
-    ASSERT_MSG(renderer2d_get_quad_index(obj) != -1, "Tried to remove non existent quad from renderer 2D.");
-
-    quad_delete(obj);
-    free(s_state.quads[renderer2d_get_quad_index(obj)]);
-    s_state.quads[renderer2d_get_quad_index(obj)] = nullptr;
+    scene_remove_quad(s_state.active_scene, obj);
 }
 
 void renderer2d_render_objects() {
-    if (quads_dirty) {
-        _renderer2d_sort_quads();
-        quads_dirty = false;
-    }
     shader_program_bind(g_state->app->shader);
-    if (s_state.quad_count != 0) {
-        for (u32 i = 0; i < s_state.quad_count; i++) {
-            if (s_state.quads[i] != nullptr) {
-                quad_render(s_state.quads[i]);
-            }
-        }
-    }
-    if (s_state.triangle_count != 0) {
-        for (u32 i = 0; i < s_state.triangle_count; i++) {
-            if (s_state.triangles[i] != nullptr) {
-                triangle_render(*s_state.triangles[i]);
-            }
-        }
-    }
+    scene_render(s_state.active_scene);
 }
 
 void renderer2d_update_objects() {
-    for (u32 i = 0; i < s_state.quad_count; i++) {
-        vector2 tmp_pos = s_state.quads[i]->position;
-        vector2 tmp_movement = s_state.quads[i]->movement;
-        if (s_state.quads[i]->update_callback != default_quad_update_callback)
-            s_state.quads[i]->update_callback(s_state.quads[i]);
-
-        if (vector2_compare(tmp_pos, s_state.quads[i]->position)) {
-            s_state.quads[i]->movement = vector2_create(0.0f, 0.0f);
-        }
-
-        if (!vector2_compare(tmp_movement, s_state.quads[i]->movement)) {
-            dispatch_event(quad_moved_event, s_state.quads[i]);
-        }
-    }
-    if (s_state.triangle_count != 0) {
-        for (u32 i = 0; i < s_state.triangle_count; i++) {
-            if (s_state.triangles[i]->update_callback != default_triangle_update_callback)
-                s_state.triangles[i]->update_callback(s_state.triangles[i]);
-        }
-    }
+    scene_update(s_state.active_scene);
 }
 
 i32 renderer2d_get_quad_index(quad* obj) {
-    for (u32 i = 0; i < s_state.quad_count; i++) {
-        if (obj->tag == s_state.quads[i]->tag) {
-            return i;
-        }
-    }
-    return -1;
+    return scene_get_quad_index(s_state.active_scene, obj);
 }
 
 quad* renderer2d_get_quad_by_tag(const char* tag) {
-    for (u32 i = 0; i < s_state.quad_count; i++) {
-        if (tag == s_state.quads[i]->tag) {
-            return s_state.quads[i];
-        }
-    }
-    return nullptr;
+    return scene_get_quad_by_tag(s_state.active_scene, tag);
 }
+
 renderer2d_state renderer2d_get_state() {
     return s_state;
 }
 
 void renderer2d_add_triangle(triangle* obj) {
-    s_state.triangles[s_state.triangle_count++] = obj;
+    scene_add_triangle(s_state.active_scene, obj);
 }
 
 void renderer2d_remove_triangle(triangle* obj) {
-    ASSERT_MSG(renderer2d_get_triangle_index(obj) != -1, "Tried to remove non existent triangle from renderer 2D.");
-
-    triangle_delete(obj);
-    free(s_state.triangles[renderer2d_get_triangle_index(obj)]);
-    s_state.triangles[renderer2d_get_triangle_index(obj)] = nullptr;
+    scene_remove_triangle(s_state.active_scene, obj);
 }
 
 i32 renderer2d_get_triangle_index(triangle* obj) {
-    for (u32 i = 0; i < s_state.triangle_count; i++) {
-        if (obj->tag == s_state.triangles[i]->tag) {
-            return i;
-        }
-    }
-    return -1;
+    return scene_get_triangle_index(s_state.active_scene, obj);
 }
 
 triangle* renderer2d_get_triangle_by_tag(const char* tag) {
-    for (u32 i = 0; i < s_state.triangle_count; i++) {
-        if (tag == s_state.triangles[i]->tag) {
-            return s_state.triangles[i];
-        }
-    }
-    return nullptr;
+    return scene_get_triangle_by_tag(s_state.active_scene, tag);
 }
 
-void _renderer2d_sort_quads() {
-    for (u32 i = 0; i < s_state.quad_count; i++) {
-        for (u32 j = i + 1; j < s_state.quad_count; j++) {
-            if (s_state.quads[i]->render_level > s_state.quads[j]->render_level) {
-                quad* tmp = s_state.quads[i];
-                s_state.quads[i] = s_state.quads[j];
-                s_state.quads[j] = tmp;
-            }
-        }
-    }
+quad* renderer2d_get_quad_in_tilemap(tile_map map, vector2 tile_pos) {
+    return scene_get_quad_in_tilemap(s_state.active_scene, map, tile_pos);
 }

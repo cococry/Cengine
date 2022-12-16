@@ -6,6 +6,7 @@
 #include "../core/event_system.h"
 #include "render_command.h"
 #include "asset_pool.h"
+#include "tilemap.h"
 
 #include "../core/logging.h"
 
@@ -27,6 +28,8 @@ quad* quad_create(const char* tag, vector2 position, vector2 scale, vector2 hit_
     ret->hit_box = hit_box;
     ret->render_level = render_level;
     ret->movement = vector2_create(0.0f, 0.0f);
+    ret->tile_map_tile_position = vector2_create(-1.0f, -1.0f);
+    ret->associated_tilemap = nullptr;
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, (subtexture == nullptr ? 0.0f : subtexture2d_get_texcoords(*subtexture).min.x),
         (subtexture == nullptr ? 0.0f : subtexture2d_get_texcoords(*subtexture).min.y),
@@ -77,7 +80,6 @@ void quad_set_sprite_animation(quad* quad, sprite_animation anim) {
 
 void quad_delete(quad* quad) {
     vertex_array_delete(&quad->va);
-    free(quad);
 }
 
 void quad_render(quad* quad) {

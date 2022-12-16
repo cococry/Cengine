@@ -8,6 +8,7 @@
 #include "subtexture2d.h"
 
 typedef struct quad quad;
+typedef struct tile_map tile_map;
 typedef void (*quad_update_callback)(quad*);
 
 typedef struct quad {
@@ -30,6 +31,9 @@ typedef struct quad {
     sprite_animation sprite_anim;
 
     quad_update_callback update_callback;
+
+    tile_map* associated_tilemap;
+    vector2 tile_map_tile_position;
 } quad;
 
 #define QUAD_LEFT_MOVE_VECTOR vector2_create(-1.0f, 0.0f)

@@ -501,7 +501,7 @@ void platform_input_shutdown() {
 }
 
 bool8 platform_key_went_down(keycode key) {
-    return input_state.key_went_down;
+    return input_state.key_went_down && input_state.keyboard_now.keys[key] == true;
 }
 
 bool8 platform_is_key_down(keycode key) {
@@ -509,15 +509,15 @@ bool8 platform_is_key_down(keycode key) {
 }
 
 bool8 platform_is_key_released(keycode key) {
-    return input_state.key_released;
+    return input_state.key_released && input_state.keyboard_now.keys[key] == false;
 }
 
 bool8 platform_key_changed(keycode key) {
-    return input_state.key_changed;
+    return input_state.key_changed && input_state.keyboard_now.keys[key] != input_state.keyboard_prev.keys[key];
 }
 
 bool8 platform_mouse_button_went_down(mouse_button button) {
-    return input_state.button_went_down;
+    return input_state.button_went_down && input_state.mouse_now.buttons[button] == true;
 }
 
 bool8 platform_is_mouse_button_down(mouse_button button) {
@@ -525,11 +525,11 @@ bool8 platform_is_mouse_button_down(mouse_button button) {
 }
 
 bool8 platform_is_mouse_button_released(mouse_button button) {
-    return input_state.button_released;
+    return input_state.button_released && input_state.mouse_now.buttons[button] == false;
 }
 
 bool8 platform_mouse_button_changed(mouse_button button) {
-    return input_state.button_changed;
+    return input_state.button_changed && input_state.mouse_now.buttons[button] != input_state.mouse_prev.buttons[button];
 }
 
 #endif

@@ -3,6 +3,7 @@
 #include "../core/defines.h"
 #include "../math/vector.h"
 #include "texture2d.h"
+#include "quad2d.h"
 
 typedef struct tile_map_tile {
     char* identifier;
@@ -27,6 +28,8 @@ typedef struct tile_map {
     texture2d* sprite_sheet;
 } tile_map;
 
+bool8 tile_map_compare(tile_map map1, tile_map map2);
+
 tile_map tile_map_create(texture2d* sprite_sheet, vector2 tile_cell_size, vector2 tile_scale, u32 tilemap_render_level);
 
 void tile_map_register_tile(tile_map* map, tile_map_tile tile);
@@ -38,3 +41,5 @@ void tile_map_commit_to_render_contiguous(tile_map* map, char** identifiers, u32
 void tile_map_commit_to_render_box(tile_map* map, char* tile_identifier, vector2 min, vector2 max);
 
 void tile_map_add_tile(tile_map* map, tile_map_tile_render tile);
+
+quad* tile_map_get_quad_by_tile_pos(tile_map map, vector2 tile_pos);

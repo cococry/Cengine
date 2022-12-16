@@ -9,6 +9,7 @@
 #include <cengine/renderer/tilemap.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "player_camera.h"
 
@@ -78,7 +79,11 @@ static void player_update_callback(quad* player) {
         quad_move_y(player, 2.5f);
     }
 }
+
 void game_init() {
+    scene* main_scene = scene_create_empty("MainScene");
+    renderer2d_set_active_scene(main_scene);
+
     texture2d* player_sprite_atlas = asset_pool_load_texture("../engine/assets/textures/spriteatlas.png");
 
     sprite_animation anim = sprite_animation_create(player_sprite_atlas, 4, 0.3f, vector2_create(16.0f, 20.0f), vector2_create(1.0f, 1.0f));
@@ -89,19 +94,39 @@ void game_init() {
     renderer2d_add_quad(s_state.player.quad_instc);
     s_state.player.quad_instc->update_callback = player_update_callback;
     s_state.player.camera = player_camera_create(vector2_create(0.0f, 0.0f));
+
     register_event(quad_moved_event, player_moved_callback, "playerMovedCb");
 
     texture2d* mc_sprite_sheet = asset_pool_load_texture("../engine/assets/textures/mc_spritesheet.png");
-    tile_map map = tile_map_create(mc_sprite_sheet, vector2_create(16.0f, 16.0f), vector2_create(50.0f, 50.0f), 0);
-    tile_map_register_tile(&map, tile_map_tile_create("g", vector2_create(1.0f, 0.0f)));
 
-    tile_map_commit_to_render_box(&map, "g", vector2_create(0.0f, 0.0f), vector2_create(10.0f, 10.0f));
+    tile_map map = tile_map_create(mc_sprite_sheet, vector2_create(16.0f, 16.0f), vector2_create(50.0f, 50.0f), 0);
+    tile_map_register_tile(&map, tile_map_tile_create("grass", vector2_create(1.0f, 0.0f)));
+    tile_map_commit_to_render_box(&map, "grass", vector2_create(0.0f, 0.0f), vector2_create(10.0f, 10.0f));
+
+    tile_map map2 = tile_map_create(mc_sprite_sheet, vector2_create(16.0f, 16.0f), vector2_create(50.0f, 50.0f), 1);
+    tile_map_register_tile(&map2, tile_map_tile_create("stone", vector2_create(5.0f, 0.0f)));
+    tile_map_commit_to_render_box(&map2, "stone", vector2_create(2.0f, 2.0f), vector2_create(8.0f, 8.0f));
+
+    {
+        scene* grass_scene = scene_create_empty("GrassScene");
+        renderer2d_set_active_scene(grass_scene);
+
+        texture2d* mc_sprite_sheet = asset_pool_load_texture("../engine/assets/textures/mc_spritesheet.png");
+        tile_map map = tile_map_create(mc_sprite_sheet, vector2_create(16.0f, 16.0f), vector2_create(50.0f, 50.0f), 0);
+        tile_map_register_tile(&map, tile_map_tile_create("grass", vector2_create(1.0f, 0.0f)));
+        tile_map_commit_to_render_box(&map, "grass", vector2_create(0.0f, 0.0f), vector2_create(15.0f, 15.0f));
+        renderer2d_add_quad(s_state.player.quad_instc);
+    }
 }
 
 void game_update() {
+    if (platform_key_went_down(KEY_L)) {
+        renderer2d_switch_active_scene_by_name("GrassScene");
+    }
+    if (platform_key_went_down(KEY_P)) {
+        renderer2d_switch_active_scene_by_name("MainScene");
+    }
     player_camera_update(&s_state.player.camera);
-
-    printf("%f\n", g_state->app->state.delta_time);
 }
 void game_terminate() {
 }

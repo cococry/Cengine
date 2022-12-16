@@ -88,7 +88,9 @@
         "game.h": "c",
         "vector2.h": "c",
         "vector3.h": "c",
-        "triangle2d.h": "c"
+        "triangle2d.h": "c",
+        "sprite_animation.h": "c",
+        "tilemap.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
 }

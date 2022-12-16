@@ -25,6 +25,30 @@ tile_map_tile tile_map_tile_create(char* identifier, vector2 texcoords) {
     return ret;
 }
 
+bool8 tile_map_compare(tile_map map1, tile_map map2) {
+    if (map1.registered_tile_count != map2.registered_tile_count) {
+        return false;
+    }
+    for (u32 i = 0; i < map1.registered_tile_count; i++) {
+        if (map1.registered_tiles[i].identifier != map2.registered_tiles[i].identifier && !vector2_compare(map1.registered_tiles[i].texcoords, map2.registered_tiles[i].texcoords)) {
+            return false;
+        }
+    }
+    if (map1.render_level != map2.render_level) {
+        return false;
+    }
+    if (!texture2d_compare(map1.sprite_sheet, map2.sprite_sheet)) {
+        return false;
+    }
+    if (!vector2_compare(map1.tile_cell_size, map2.tile_cell_size)) {
+        return false;
+    }
+    if (!vector2_compare(map1.tile_scale, map2.tile_scale)) {
+        return false;
+    }
+    return true;
+}
+
 tile_map tile_map_create(texture2d* sprite_sheet, vector2 tile_cell_size, vector2 tile_scale, u32 tilemap_render_level) {
     tile_map ret;
     ret.registered_tiles = malloc(sizeof(tile_map_tile) * MAX_REGISTERED_TILES);
@@ -58,6 +82,8 @@ void tile_map_commit_to_render(tile_map* map, tile_map_tile_render tiles[], u32 
                 map->render_level,
                 vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
                 &texture);
+            quad_to_render->associated_tilemap = map;
+            quad_to_render->tile_map_tile_position = tiles[i].position;
             renderer2d_add_quad(quad_to_render);
         }
     }
@@ -89,6 +115,8 @@ void tile_map_commit_to_render_contiguous(tile_map* map, char** identifiers, u32
                 map->render_level,
                 vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
                 &texture);
+            quad_to_render->associated_tilemap = map;
+            quad_to_render->tile_map_tile_position = pos;
             renderer2d_add_quad(quad_to_render);
             x++;
         }
@@ -116,6 +144,8 @@ void tile_map_commit_to_render_box(tile_map* map, char* tile_identifier, vector2
                                                    map->render_level,
                                                    vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
                                                    &texture);
+                quad_to_render->associated_tilemap = map;
+                quad_to_render->tile_map_tile_position = vector2_create(x, y);
                 renderer2d_add_quad(quad_to_render);
             }
         }
@@ -141,6 +171,12 @@ void tile_map_add_tile(tile_map* map, tile_map_tile_render tile) {
                                            map->render_level,
                                            vector4_create(1.0f, 1.0f, 1.0f, 1.0f),
                                            &texture);
+        quad_to_render->associated_tilemap = map;
+        quad_to_render->tile_map_tile_position = tile.position;
         renderer2d_add_quad(quad_to_render);
     }
+}
+
+quad* tile_map_get_quad_by_tile_pos(tile_map map, vector2 tile_pos) {
+    return renderer2d_get_quad_in_tilemap(map, tile_pos);
 }
