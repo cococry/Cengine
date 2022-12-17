@@ -11,6 +11,7 @@
 #include "../core/logging.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 void default_quad_update_callback(quad* this) {
 }
@@ -30,6 +31,7 @@ quad* quad_create(const char* tag, vector2 position, vector2 scale, vector2 hit_
     ret->movement = vector2_create(0.0f, 0.0f);
     ret->tile_map_tile_position = vector2_create(-1.0f, -1.0f);
     ret->associated_tilemap = nullptr;
+    ret->moved = false;
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, (subtexture == nullptr ? 0.0f : subtexture2d_get_texcoords(*subtexture).min.x),
         (subtexture == nullptr ? 0.0f : subtexture2d_get_texcoords(*subtexture).min.y),
@@ -95,7 +97,7 @@ void quad_render(quad* quad) {
     }
     matrix4 model_matrix =
         matrix4_multiply(
-            translate_mv(matrix4_identity(), vector3_create(quad->position.x / 100.0f, quad->position.y / 100.0f, 0.0f)),
+            translate_mv(matrix4_identity(), vector3_create(quad->position.x, quad->position.y, 0.0f)),
             scale_mv(matrix4_identity(), vector3_create(quad->scale.x, quad->scale.y, 1.0f)));
 
     shader_program_upload_vec4(g_state->app->shader, "u_color", quad->color);

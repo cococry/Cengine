@@ -3,10 +3,18 @@
 #include "tilemap.h"
 #include "scene.h"
 
+typedef struct scene_fade_overlay {
+    quad* quad_instc;
+    quad* player_instc;
+    bool8 play_anim;
+    bool8 fade_out_anim_played;
+} scene_fade_overlay;
+
 typedef struct renderer2d_state {
     scene* active_scene;
     scene** scenes;
     u32 scene_count;
+    scene_fade_overlay _fade_overlay;
 } renderer2d_state;
 
 void renderer2d_init();
@@ -16,6 +24,8 @@ void renderer2d_terminate();
 void renderer2d_add_scene(scene* scene);
 
 void renderer2d_set_active_scene(scene* scene);
+
+void renderer2d_set_player_quad(quad* player);
 
 void renderer2d_switch_active_scene_by_name(const char* name);
 

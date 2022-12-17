@@ -127,6 +127,7 @@ void scene_update(scene* scene) {
     for (u32 i = 0; i < scene->quad_count; i++) {
         vector2 tmp_pos = scene->quads[i]->position;
         vector2 tmp_movement = scene->quads[i]->movement;
+        scene->quads[i]->moved = false;
         if (scene->quads[i]->update_callback != default_quad_update_callback)
             scene->quads[i]->update_callback(scene->quads[i]);
 
@@ -136,6 +137,7 @@ void scene_update(scene* scene) {
 
         if (!vector2_compare(tmp_movement, scene->quads[i]->movement)) {
             dispatch_event(quad_moved_event, scene->quads[i]);
+            scene->quads[i]->moved = true;
         }
     }
     if (scene->triangle_count != 0) {

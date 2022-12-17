@@ -195,33 +195,42 @@ void matrix4_subm(matrix4* source, matrix4 m) {
 }
 
 matrix4 matrix4_multiply(matrix4 m1, matrix4 m2) {
+    vector4 SrcA0 = m1.row1;
+    vector4 SrcA1 = m1.row2;
+    vector4 SrcA2 = m1.row3;
+    vector4 SrcA3 = m1.row4;
+
+    vector4 SrcB0 = m2.row1;
+    vector4 SrcB1 = m2.row2;
+    vector4 SrcB2 = m2.row3;
+    vector4 SrcB3 = m2.row4;
+
     matrix4 ret;
 
-    vector4 m2_col1 = matrix4_get_column(m2, 0);
-    vector4 m2_col2 = matrix4_get_column(m2, 1);
-    vector4 m2_col3 = matrix4_get_column(m2, 2);
-    vector4 m2_col4 = matrix4_get_column(m2, 3);
-
-    ret.row1.x = m1.row1.x * m2_col1.x + m1.row1.y * m2_col1.y + m1.row1.z * m2_col1.z + m1.row1.w * m2_col1.w;
-    ret.row1.y = m1.row1.x * m2_col2.x + m1.row1.y * m2_col2.y + m1.row1.z * m2_col2.z + m1.row1.w * m2_col2.w;
-    ret.row1.z = m1.row1.x * m2_col3.x + m1.row1.y * m2_col3.y + m1.row1.z * m2_col3.z + m1.row1.w * m2_col3.w;
-    ret.row1.w = m1.row1.x * m2_col4.x + m1.row1.y * m2_col4.y + m1.row1.z * m2_col4.z + m1.row1.w * m2_col4.w;
-
-    ret.row2.x = m1.row2.x * m2_col1.x + m1.row2.y * m2_col1.y + m1.row2.z * m2_col1.z + m1.row2.w * m2_col1.w;
-    ret.row2.y = m1.row2.x * m2_col2.x + m1.row2.y * m2_col2.y + m1.row2.z * m2_col2.z + m1.row2.w * m2_col2.w;
-    ret.row2.z = m1.row2.x * m2_col3.x + m1.row2.y * m2_col3.y + m1.row2.z * m2_col3.z + m1.row2.w * m2_col3.w;
-    ret.row2.w = m1.row2.x * m2_col4.x + m1.row2.y * m2_col4.y + m1.row2.z * m2_col4.z + m1.row2.w * m2_col4.w;
-
-    ret.row3.x = m1.row3.x * m2_col1.x + m1.row3.y * m2_col1.y + m1.row3.z * m2_col1.z + m1.row3.w * m2_col1.w;
-    ret.row3.y = m1.row3.x * m2_col2.x + m1.row3.y * m2_col2.y + m1.row3.z * m2_col2.z + m1.row3.w * m2_col2.w;
-    ret.row3.z = m1.row3.x * m2_col3.x + m1.row3.y * m2_col3.y + m1.row3.z * m2_col3.z + m1.row3.w * m2_col3.w;
-    ret.row3.w = m1.row3.x * m2_col4.x + m1.row3.y * m2_col4.y + m1.row3.z * m2_col4.z + m1.row3.w * m2_col4.w;
-
-    ret.row4.x = m1.row4.x * m2_col1.x + m1.row4.y * m2_col1.y + m1.row4.z * m2_col1.z + m1.row4.w * m2_col1.w;
-    ret.row4.y = m1.row4.x * m2_col2.x + m1.row4.y * m2_col2.y + m1.row4.z * m2_col2.z + m1.row4.w * m2_col2.w;
-    ret.row4.z = m1.row4.x * m2_col3.x + m1.row4.y * m2_col3.y + m1.row4.z * m2_col3.z + m1.row4.w * m2_col3.w;
-    ret.row4.w = m1.row4.x * m2_col4.x + m1.row4.y * m2_col4.y + m1.row4.z * m2_col4.z + m1.row4.w * m2_col4.w;
-
+    ret.row1 = vector4_additition(vector4_additition(
+                                      vector4_scaler_multiplication(SrcA0, SrcB0.x),
+                                      vector4_scaler_multiplication(SrcA1, SrcB0.y)),
+                                  vector4_additition(
+                                      vector4_scaler_multiplication(SrcA2, SrcB0.z),
+                                      vector4_scaler_multiplication(SrcA3, SrcB0.w)));
+    ret.row2 = vector4_additition(vector4_additition(
+                                      vector4_scaler_multiplication(SrcA0, SrcB1.x),
+                                      vector4_scaler_multiplication(SrcA1, SrcB1.y)),
+                                  vector4_additition(
+                                      vector4_scaler_multiplication(SrcA2, SrcB1.z),
+                                      vector4_scaler_multiplication(SrcA3, SrcB1.w)));
+    ret.row3 = vector4_additition(vector4_additition(
+                                      vector4_scaler_multiplication(SrcA0, SrcB2.x),
+                                      vector4_scaler_multiplication(SrcA1, SrcB2.y)),
+                                  vector4_additition(
+                                      vector4_scaler_multiplication(SrcA2, SrcB2.z),
+                                      vector4_scaler_multiplication(SrcA3, SrcB2.w)));
+    ret.row4 = vector4_additition(vector4_additition(
+                                      vector4_scaler_multiplication(SrcA0, SrcB3.x),
+                                      vector4_scaler_multiplication(SrcA1, SrcB3.y)),
+                                  vector4_additition(
+                                      vector4_scaler_multiplication(SrcA2, SrcB3.z),
+                                      vector4_scaler_multiplication(SrcA3, SrcB3.w)));
     return ret;
 }
 

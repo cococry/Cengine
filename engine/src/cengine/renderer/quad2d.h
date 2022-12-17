@@ -34,6 +34,8 @@ typedef struct quad {
 
     tile_map* associated_tilemap;
     vector2 tile_map_tile_position;
+    bool8 moved;
+
 } quad;
 
 #define QUAD_LEFT_MOVE_VECTOR vector2_create(-1.0f, 0.0f)
@@ -42,7 +44,8 @@ typedef struct quad {
 #define QUAD_DOWN_MOVE_VECTOR vector2_create(0.0f, -1.0f)
 #define QUAD_IDLE_VECTOR vector2_create(0.0f, 0.0f)
 
-quad* quad_create(const char* tag, vector2 position, vector2 scale, vector2 hit_box, float rotation, u32 render_level, vector4 color, subtexture2d* subtexture);
+quad* quad_create(const char* tag, vector2 position, vector2 scale, vector2 hit_box, float rotation, u32 render_level, vector4 color,
+                  subtexture2d* subtexture);
 
 void quad_load_texture(quad* quad, const char* texture_filepath);
 

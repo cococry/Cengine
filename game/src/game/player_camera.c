@@ -3,11 +3,13 @@
 #include <cengine/core/global_state.h>
 #include <cengine/math/matrix_transform.h>
 #include <cengine/platform/platform.h>
+#include <cengine/core/event_system.h>
 
-player_camera player_camera_create(vector2 position) {
+player_camera player_camera_create(vector2 position, quad* player) {
     player_camera ret;
     ret.position = position;
     ret.view_matrix = matrix4_identity();
+    ret.player = player;
     return ret;
 }
 

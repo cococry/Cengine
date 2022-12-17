@@ -68,6 +68,17 @@ static void player_moved_callback(void* data) {
 }
 
 static void player_update_callback(quad* player) {
+    if (quad_collding_with_quad(player, s_state.door)) {
+        if (strcmp(renderer2d_get_state().active_scene->name, "MainScene") == 0) {
+            renderer2d_switch_active_scene_by_name("GrassScene");
+            s_state.door->position = vector2_create(50.0f, 50.0f);
+            return;
+        } else if (strcmp(renderer2d_get_state().active_scene->name, "GrassScene") == 0) {
+            renderer2d_switch_active_scene_by_name("MainScene");
+            s_state.door->position = vector2_create(700.0f, 700.0f);
+            return;
+        }
+    }
     if (platform_is_key_down(KEY_A)) {
         quad_move_x(player, -2.5f);
     } else if (platform_is_key_down(KEY_D)) {
@@ -93,7 +104,12 @@ void game_init() {
     quad_set_sprite_animation(s_state.player.quad_instc, anim);
     renderer2d_add_quad(s_state.player.quad_instc);
     s_state.player.quad_instc->update_callback = player_update_callback;
-    s_state.player.camera = player_camera_create(vector2_create(0.0f, 0.0f));
+    s_state.player.camera = player_camera_create(vector2_create(0.0f, 0.0f), s_state.player.quad_instc);
+
+    s_state.door = quad_create("Door", vector2_create(50.0f, 50.0f), vector2_create(100.0f, 100.0f), vector2_create(100.0f, 100.0f), 0.0f,
+                               2, vector4_create(1.0f, 1.0f, 1.0f, 1.0f), nullptr);
+    quad_load_texture(s_state.door, "../engine/assets/textures/door.png");
+    renderer2d_add_quad(s_state.door);
 
     register_event(quad_moved_event, player_moved_callback, "playerMovedCb");
 
@@ -116,16 +132,12 @@ void game_init() {
         tile_map_register_tile(&map, tile_map_tile_create("grass", vector2_create(1.0f, 0.0f)));
         tile_map_commit_to_render_box(&map, "grass", vector2_create(0.0f, 0.0f), vector2_create(15.0f, 15.0f));
         renderer2d_add_quad(s_state.player.quad_instc);
+        renderer2d_add_quad(s_state.door);
     }
+    renderer2d_set_player_quad(s_state.player.quad_instc);
 }
 
 void game_update() {
-    if (platform_key_went_down(KEY_L)) {
-        renderer2d_switch_active_scene_by_name("GrassScene");
-    }
-    if (platform_key_went_down(KEY_P)) {
-        renderer2d_switch_active_scene_by_name("MainScene");
-    }
     player_camera_update(&s_state.player.camera);
 }
 void game_terminate() {

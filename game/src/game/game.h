@@ -10,7 +10,7 @@ typedef struct game_player {
 
 typedef struct game_state {
     game_player player;
-    quad* background;
+    quad* door;
 } game_state;
 
 void game_init();

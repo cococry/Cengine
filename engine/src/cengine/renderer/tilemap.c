@@ -137,7 +137,7 @@ void tile_map_commit_to_render_box(tile_map* map, char* tile_identifier, vector2
                 subtexture2d texture = subtexture2d_create(map->sprite_sheet, map_tile->texcoords,
                                                            map->tile_cell_size, vector2_create(1.0f, 1.0f));
                 quad* quad_to_render = quad_create("TilemapTile",
-                                                   vector2_multiply(vector2_create(x, y), vector2_create(100.0f, 100.0f)),
+                                                   vector2_multiply(vector2_create(x, y), map->tile_scale),
                                                    map->tile_scale,
                                                    map->tile_scale,
                                                    0.0f,

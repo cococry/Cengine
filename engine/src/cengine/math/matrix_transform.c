@@ -9,6 +9,7 @@ matrix4 translate_mv(matrix4 m, vector3 v) {
                                       vector4_scaler_multiplication(m.row2, v.y)),
                                   vector4_additition(vector4_scaler_multiplication(m.row3, v.z),
                                                      m.row4));
+
     return ret;
 }
 
