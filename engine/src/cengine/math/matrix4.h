@@ -57,3 +57,5 @@ matrix4 matrix4_transpose(matrix4 m);
 void matrix4_log(matrix4 m);
 
 matrix4 matrix4_inverse(matrix4 m);
+
+vector4 vector4_multiply_matrix4(matrix4 m, vector4 v);

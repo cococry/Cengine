@@ -63,3 +63,5 @@ float vector2_distance(vector2 v1, vector2 v2);
 void vector2_log(vector2 v);
 
 void vector2_log_new_line(vector2 v);
+
+void vector2_set_value_at_index(vector2* v, u32 i, u32 val);

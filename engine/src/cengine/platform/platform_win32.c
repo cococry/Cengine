@@ -13,8 +13,6 @@
 #include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
 
-#include "../renderer/renderer2d.h"
-
 typedef BOOL(WINAPI* PFNWGLCHOOSEPIXELFORMATARBPROC)(HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
 typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
 typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
@@ -83,8 +81,11 @@ static LRESULT CALLBACK win32_update_messeges(HWND window, u32 msg, WPARAM w_par
             _platform_process_key(key, pressed);
         } break;
         case WM_MOUSEMOVE: {
-            u32 xpos = GET_X_LPARAM(l_param);
-            u32 ypos = GET_Y_LPARAM(l_param);
+            POINT mouse;
+            GetCursorPos(&mouse);
+            ScreenToClient(window, &mouse);
+            i32 xpos = mouse.x;
+            i32 ypos = mouse.y;
 
             _platform_process_mouse_move(xpos, ypos);
         } break;
@@ -209,7 +210,8 @@ window* platform_window_create(window_properties props) {
     windowy += border_rect.top;
 
     window_width += border_rect.right - border_rect.left;
-    window_height += border_rect.bottom + border_rect.top;
+    window_height += border_rect.bottom - border_rect.top;
+    LOG_INFO("%i", window_height);
 
     HWND handle = CreateWindowExA(window_ex_style, "cengineWindow",
                                   props.title, backend_handle->window_style, windowx, windowy, window_width, window_height,

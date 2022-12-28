@@ -30,7 +30,9 @@ PFNGLUNIFORM2FVPROC glUniform2fv;
 PFNGLUNIFORM3FVPROC glUniform3fv;
 PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLGETSTRINGPROC glGetString;
 PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM1IVPROC glUniform1iv;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
 PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
@@ -81,6 +83,8 @@ void load_gl_functions() {
         (PFNGLBUFFERDATAPROC)load_gl_function("glBufferData");
     glBufferSubData =
         (PFNGLBUFFERSUBDATAPROC)load_gl_function("glBufferSubData");
+    glGetString =
+        (PFNGLGETSTRINGPROC)load_gl_function("glGetString");
     glDeleteBuffers =
         (PFNGLDELETEBUFFERSPROC)load_gl_function("glDeleteBuffers");
     glCreateProgram =
@@ -117,6 +121,8 @@ void load_gl_functions() {
         (PFNGLUNIFORM4FVPROC)load_gl_function("glUniform4fv");
     glUniform1i =
         (PFNGLUNIFORM1IPROC)load_gl_function("glUniform1i");
+    glUniform1iv =
+        (PFNGLUNIFORM1IVPROC)load_gl_function("glUniform1iv");
     glUniform1f =
         (PFNGLUNIFORM1FPROC)load_gl_function("glUniform1f");
     glGetUniformLocation =

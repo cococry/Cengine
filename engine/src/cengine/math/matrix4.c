@@ -354,3 +354,18 @@ matrix4 matrix4_inverse(matrix4 m) {
 
     return matrix4_scaler_mul(Inverse, OneOverDeterminant);
 }
+
+vector4 vector4_multiply_matrix4(matrix4 m, vector4 v) {
+    vector4 Mov0 = vector4_create(v.x, v.x, v.x, v.x);
+    vector4 Mov1 = vector4_create(v.y, v.y, v.y, v.y);
+    vector4 Mul0 = vector4_multiply(m.row1, Mov0);
+    vector4 Mul1 = vector4_multiply(m.row2, Mov1);
+    vector4 Add0 = vector4_additition(Mul0, Mul1);
+    vector4 Mov2 = vector4_create(v.z, v.z, v.z, v.z);
+    vector4 Mov3 = vector4_create(v.w, v.w, v.w, v.w);
+    vector4 Mul2 = vector4_multiply(m.row3, Mov2);
+    vector4 Mul3 = vector4_multiply(m.row4, Mov3);
+    vector4 Add1 = vector4_additition(Mul2, Mul3);
+    vector4 Add2 = vector4_additition(Add0, Add1);
+    return Add2;
+}

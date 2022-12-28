@@ -90,7 +90,10 @@
         "vector3.h": "c",
         "triangle2d.h": "c",
         "sprite_animation.h": "c",
-        "tilemap.h": "c"
+        "tilemap.h": "c",
+        "physac.h": "c",
+        "box2d.h": "c",
+        "xutility": "c"
     },
-    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.errorSquiggles": "disabled",
 }

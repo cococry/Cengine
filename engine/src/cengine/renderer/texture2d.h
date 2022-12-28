@@ -19,8 +19,12 @@ void texture2d_bind(texture2d* texture);
 
 void texture2d_bind_unit(texture2d* texture, u32 slot);
 
+void texture2d_active_slot(texture2d* texture, u32 slot);
+
 void texture2d_unbind(texture2d* texture);
 
 void texture2d_delete(texture2d* texture);
+
+void texture2d_set_data(texture2d* texture, void* data, u32 data_size);
 
 bool8 texture2d_compare(texture2d* texture1, texture2d* texture2);

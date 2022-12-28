@@ -19,6 +19,8 @@ char* get_file_content(const char* filename) {
             fread(buffer, 1, length, f);
         }
         fclose(f);
+
+        buffer[length] = '\0';
     }
 
     ASSERT_MSG(buffer != nullptr, "Failed to load file.");

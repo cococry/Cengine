@@ -9,15 +9,15 @@
 
 #include "../renderer/render_command.h"
 #include "../renderer/render_defines.h"
-#include "../renderer/renderer2d.h"
 #include "../renderer/asset_pool.h"
+#include "../renderer/batch_renderer.h"
 
 #include "../platform/opengl/gl_functions.h"
-
 #include "../math/matrix.h"
 #include "../math/radians.h"
 
-static void close_callback(void* data) {
+static void
+close_callback(void* data) {
     application* app = (application*)data;
     app->state.running = false;
 }
@@ -50,8 +50,6 @@ application* application_create(window_properties props, game_callbacks game_cbs
     register_event(window_close_event, close_callback, "closeCb");
     register_event(window_resize_event, resize_callback, "resizeCb");
 
-    platform_input_init();
-
     ret->state.delta_time = 0.0f;
     ret->game_cbs = game_cbs;
 
@@ -59,7 +57,9 @@ application* application_create(window_properties props, game_callbacks game_cbs
     g_state->app = ret;
 
     asset_pool_init();
-    renderer2d_init();
+    platform_input_init();
+    batch_renderer_init();
+
     if (ret->game_cbs.game_init_cb != nullptr)
         ret->game_cbs.game_init_cb();
 
@@ -79,9 +79,6 @@ void application_run(application* app) {
         render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
         render_command_clear_color(RGB_COLOR(69, 69, 69), 1.0f);
 
-        renderer2d_update_objects();
-        renderer2d_render_objects();
-
         if (app->game_cbs.game_update_cb != nullptr)
             app->game_cbs.game_update_cb();
 
@@ -93,8 +90,8 @@ void application_shutdown(application* app) {
     app->state.running = false;
     platform_window_destroy(app->wnd);
     destroy_listeners(event_listeners, max_events);
-    renderer2d_terminate();
     platform_input_shutdown();
+    batch_renderer_terminate();
     if (app->game_cbs.game_terminate_cb != nullptr)
         app->game_cbs.game_terminate_cb();
     free(g_state);

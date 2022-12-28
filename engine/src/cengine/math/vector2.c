@@ -149,3 +149,11 @@ void vector2_log(vector2 v) {
 void vector2_log_new_line(vector2 v) {
     printf("x: %f, y: %f\n", v.x, v.y);
 }
+
+void vector2_set_value_at_index(vector2* v, u32 i, u32 val) {
+    if (i == 0) {
+        v->x = val;
+        return;
+    }
+    v->y = val;
+}

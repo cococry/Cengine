@@ -28,6 +28,8 @@ void shader_program_upload_mat4(shader_program* program, const char* uniform_nam
 
 void shader_program_upload_int(shader_program* program, const char* uniform_name, i32 uniform_value);
 
+void shader_program_upload_int_array(shader_program* program, const char* uniform_name, i32* values, u32 count);
+
 void shader_program_upload_float(shader_program* program, const char* uniform_name, float uniform_value);
 
 void _link_gl_shader_program(shader_program* program, render_id vertex_shader, render_id fragment_shader);

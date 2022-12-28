@@ -69,7 +69,7 @@ texture2d* texture2d_create_by_size(u32 width, u32 height) {
     glTextureParameteri(ret->id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTextureParameteri(ret->id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(ret->id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+    
     return ret;
 }
 
@@ -79,6 +79,9 @@ void texture2d_bind(texture2d* texture) {
 
 void texture2d_bind_unit(texture2d* texture, u32 slot) {
     glBindTextureUnit(slot, texture->id);
+}
+void texture2d_active_slot(texture2d* texture, u32 slot) {
+    glActiveTexture(GL_TEXTURE0 + slot);
 }
 
 void texture2d_unbind(texture2d* texture) {
@@ -91,4 +94,10 @@ void texture2d_delete(texture2d* texture) {
 
 bool8 texture2d_compare(texture2d* texture1, texture2d* texture2) {
     return texture1->id == texture2->id;
+}
+
+void texture2d_set_data(texture2d* texture, void* data, u32 data_size) {
+    u32 bpp = texture->data_format == GL_RGBA ? 4 : 3;
+    ASSERT_MSG(data_size == texture->width * texture->height * bpp, "Texture data musst fill entire texture.");
+    glTextureSubImage2D(texture->id, 0, 0, 0, texture->width, texture->height, texture->data_format, GL_UNSIGNED_BYTE, data);
 }
