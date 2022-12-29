@@ -16,6 +16,9 @@
 #include "../math/matrix.h"
 #include "../math/radians.h"
 
+#include "../ecs/ecs.h"
+#include "../ecs/components.h"
+
 static void
 close_callback(void* data) {
     application* app = (application*)data;
@@ -28,6 +31,11 @@ static void resize_callback(void* data) {
     u32 height = size[1];
 
     render_command_resize_viewport(width, height);
+    if (width == 0 || height == 0) {
+        g_state->app->state.minimized = true;
+    } else {
+        g_state->app->state.minimized = false;
+    }
 }
 
 game_callbacks game_callbacks_create() {
@@ -51,14 +59,17 @@ application* application_create(window_properties props, game_callbacks game_cbs
     register_event(window_resize_event, resize_callback, "resizeCb");
 
     ret->state.delta_time = 0.0f;
+    ret->state.minimized = false;
     ret->game_cbs = game_cbs;
 
     g_state = malloc(sizeof(global_state));
     g_state->app = ret;
+    g_state->entity_count = 0;
 
     asset_pool_init();
     platform_input_init();
     batch_renderer_init();
+    ecs_init(3, sizeof(transform_component), sizeof(sprite_component));
 
     if (ret->game_cbs.game_init_cb != nullptr)
         ret->game_cbs.game_init_cb();
@@ -68,21 +79,21 @@ application* application_create(window_properties props, game_callbacks game_cbs
 
 void application_run(application* app) {
     while (app->state.running) {
-        if (platform_window_close_requested(app->wnd))
-            application_stop(app);
-        if (platform_is_key_down(KEY_ESCAPE)) {
-            application_stop(app);
+        if (!app->state.minimized) {
+            if (platform_window_close_requested(app->wnd))
+                application_stop(app);
+            if (platform_is_key_down(KEY_ESCAPE)) {
+                application_stop(app);
+            }
+
+            render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
+            render_command_clear_color(RGB_COLOR(69, 69, 69), 1.0f);
+
+            if (app->game_cbs.game_update_cb != nullptr)
+                app->game_cbs.game_update_cb();
+            platform_input_update();
         }
-
         platform_window_update(app->wnd);
-
-        render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
-        render_command_clear_color(RGB_COLOR(69, 69, 69), 1.0f);
-
-        if (app->game_cbs.game_update_cb != nullptr)
-            app->game_cbs.game_update_cb();
-
-        platform_input_update();
     }
 }
 

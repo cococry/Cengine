@@ -15,7 +15,7 @@ typedef enum event_type {
     mouse_button_changed_event,
     mouse_scrolled_event,
     mouse_moved_event,
-    quad_moved_event,
+    entity_moved_event,
     max_events,
 } event_type;
 

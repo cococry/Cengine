@@ -93,7 +93,10 @@
         "tilemap.h": "c",
         "physac.h": "c",
         "box2d.h": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "ecs.h": "c",
+        "components.h": "c",
+        "player_camera.h": "c"
     },
-    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.errorSquiggles": "enabled",
 }

@@ -15,6 +15,7 @@ typedef void (*game_terminate_callback)();
 typedef struct application_state {
     bool8 running;
     float delta_time;
+    bool8 minimized;
 } application_state;
 
 typedef struct game_callbacks {
@@ -28,7 +29,6 @@ game_callbacks game_callbacks_create();
 typedef struct application {
     application_state state;
     window* wnd;
-    shader_program* shader;
     game_callbacks game_cbs;
 } application;
 

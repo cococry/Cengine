@@ -1,7 +1,6 @@
 #include "batch_renderer.h"
 
 #include "vertex_array.h"
-#include "shader.h"
 #include "render_command.h"
 
 #include "../core/global_state.h"
@@ -87,6 +86,9 @@ void batch_renderer_init() {
     s_data.vertex_positions[1] = vector4_create(0.5f, -0.5f, 0.0f, 1.0f);
     s_data.vertex_positions[2] = vector4_create(0.5f, 0.5f, 0.0f, 1.0f);
     s_data.vertex_positions[3] = vector4_create(-0.5f, 0.5f, 0.0f, 1.0f);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 void batch_renderer_terminate() {
     free(s_data.vertex_buffer);
@@ -98,9 +100,9 @@ void batch_renderer_set_sprite_sheet(texture2d* spritesheet) {
     shader_program_upload_int(s_data.shader, "u_texture", 0);
 }
 
-void batch_renderer_begin_render() {
+void batch_renderer_begin_render(matrix4 view_matrix) {
     shader_program_bind(s_data.shader);
-    shader_program_upload_mat4(s_data.shader, "u_view", matrix4_identity());
+    shader_program_upload_mat4(s_data.shader, "u_view", view_matrix);
 
     s_data.index_count = 0;
     s_data.vertex_buffer_ptr = s_data.vertex_buffer;
@@ -192,4 +194,8 @@ void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 col
 
 batch_renderer_stats batch_renderer_get_stats() {
     return s_data.stats;
+}
+
+shader_program* batch_renderer_get_shader() {
+    return s_data.shader;
 }
