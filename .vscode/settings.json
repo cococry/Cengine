@@ -96,7 +96,8 @@
         "xutility": "c",
         "ecs.h": "c",
         "components.h": "c",
-        "player_camera.h": "c"
+        "player_camera.h": "c",
+        "batch_renderer.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }

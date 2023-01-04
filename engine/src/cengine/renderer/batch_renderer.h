@@ -26,6 +26,8 @@ void batch_renderer_render_quad(vector2 position, vector2 scale, float rotation,
 
 void batch_renderer_end_render();
 
+texture2d* batch_renderer_get_sprite_sheet();
+
 shader_program* batch_renderer_get_shader();
 
 batch_renderer_stats batch_renderer_get_stats();

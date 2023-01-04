@@ -5,6 +5,7 @@
 #include <cengine/core/logging.h>
 #include <cengine/renderer/asset_pool.h>
 #include <cengine/renderer/batch_renderer.h>
+#include <cengine/renderer/tilemap.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -16,6 +17,8 @@
 
 static entity player;
 static sprite_animation anim;
+static tile_map map;
+static vector3 position;
 
 static void entity_moved_callback(void* data) {
     u32 entty_id = *(u32*)data;
@@ -33,18 +36,9 @@ static void entity_moved_callback(void* data) {
         sprite_animation_set_anim_contigues_x(&anim, 0.0f, 4.0f, 0.0f, 4);
     }
 }
-static void render_system() {
-    ecs_query_result* qr = ecs_query(2, 0, 1);
-    batch_renderer_begin_render(matrix4_identity());
-    for (u32 i = 0; i < qr->count; i++) {
-        transform_component* tc = (transform_component*)ecs_get_component(qr->list[i], 0);
-        sprite_component* sc = (sprite_component*)ecs_get_component(qr->list[i], 1);
-        batch_renderer_render_sprite(tc->position, tc->scale, tc->rotation, sc->uv, sc->cell_size, sc->color);
-    }
-    batch_renderer_end_render();
-}
+
 void game_init() {
-    batch_renderer_set_sprite_sheet(asset_pool_load_texture("../game/assets/textures/spritesheet.png"));
+    batch_renderer_set_sprite_sheet(asset_pool_load_texture("../game/assets/textures/terrain.png"));
 
     player = entity_create();
     transform_component tc = transform_component_create(vector2_create(500.0f, 500.0f), vector2_create(100.0f, 100.0f), 0.0f);
@@ -56,6 +50,17 @@ void game_init() {
     sprite_animation_set_anim_contigues_x(&anim, 0.0f, 4.0f, 0.0f, 4);
 
     register_event(entity_moved_event, entity_moved_callback, "entityMovedCb");
+
+    map = tile_map_create(vector2_create(16.0f, 16.0f), vector2_create(20.0f, 20.0f), vector2_create(300.0f, 300.0f));
+
+    tile_map_register_tile(&map, registered_tile_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0f), vector2_create(3.0f, 0.0f)));
+    tile_map_register_tile(&map, registered_tile_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0f), vector2_create(1.0f, 0.0f)));
+    tile_map_register_tile(&map, registered_tile_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0f), vector2_create(0.0f, 0.0f)));
+    tile_map_register_tile(&map, registered_tile_create(vector4_create(255.0f, 255.0f, 255.0f, 255.0f), vector2_create(4.0f, 0.0f)));
+
+    tile_map_load_from_file(&map, "../game/assets/textures/tilemap_test.png");
+
+    position = vector3_create(0.0f, 0.0f, 0.0f);
 }
 
 void start_moving_system() {
@@ -96,24 +101,24 @@ void end_moving_system() {
 }
 
 void game_update() {
-    render_system();
-    start_moving_system();
     if (platform_is_key_down(KEY_A)) {
-        transform_component* tc = ecs_get_component(player.id, 0);
-        tc->position.x -= 100 * g_state->app->state.delta_time;
+        position.x += 200.0f * g_state->app->state.delta_time;
     }
     if (platform_is_key_down(KEY_D)) {
-        transform_component* tc = ecs_get_component(player.id, 0);
-        tc->position.x += 100 * g_state->app->state.delta_time;
+        position.x -= 200.0f * g_state->app->state.delta_time;
     }
     if (platform_is_key_down(KEY_S)) {
-        transform_component* tc = ecs_get_component(player.id, 0);
-        tc->position.y -= 100 * g_state->app->state.delta_time;
+        position.y += 200.0f * g_state->app->state.delta_time;
     }
     if (platform_is_key_down(KEY_W)) {
-        transform_component* tc = ecs_get_component(player.id, 0);
-        tc->position.y += 100 * g_state->app->state.delta_time;
+        position.y -= 200.0f * g_state->app->state.delta_time;
     }
+    matrix4 view = translate_mv(matrix4_identity(), position);
+    batch_renderer_begin_render(view);
+    tile_map_render(&map);
+    batch_renderer_end_render();
+    start_moving_system();
+
     sprite_animation_tick_on_entity(&anim, player);
     end_moving_system();
 }

@@ -143,7 +143,7 @@ bool8 vector4_perpendicular(vector4 v1, vector4 v2) {
 }
 
 bool8 vector4_compare(vector4 v1, vector4 v2) {
-    return v1.x == v2.x && v1.y == v1.y && v1.z == v2.z && v1.w == v2.w;
+    return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w;
 }
 
 vector4 vector4_normalized(vector4 v) {

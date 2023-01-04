@@ -8,7 +8,7 @@ in flat int v_using_textures;
 uniform sampler2D u_texture;		
 
 void main() {
-    if(v_using_textures == 1) {
+    if(v_using_textures == 0) {
         o_color = texture(u_texture, v_texcoord) * v_color;
     } else {
         o_color = v_color;

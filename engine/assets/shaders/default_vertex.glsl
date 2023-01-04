@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec4 a_color;
 layout(location = 2) in vec2 a_texcoord;
-layout(location = 3) in int a_using_textures;
+layout(location = 4) in int a_using_textures;
 
 uniform mat4 u_proj;
 uniform mat4 u_view;

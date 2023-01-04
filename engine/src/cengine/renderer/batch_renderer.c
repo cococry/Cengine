@@ -12,6 +12,8 @@
 
 #include <stdlib.h>
 
+#define MAX_SPRITE_SHEETS 32
+
 typedef struct vertex {
     vector3 position;
     vector4 color;
@@ -35,6 +37,7 @@ typedef struct batch_renderer_data {
     vector4* vertex_positions;
 
     texture2d* sprite_sheet;
+    u32 sprite_sheet_count;
 
     batch_renderer_stats stats;
 } batch_renderer_data;
@@ -42,7 +45,7 @@ typedef struct batch_renderer_data {
 batch_renderer_data s_data;
 
 void batch_renderer_init() {
-    s_data.max_quads = 10000;
+    s_data.max_quads = 100000;
     s_data.index_count = 0;
 
     s_data.vao = vertex_array_create();
@@ -97,6 +100,7 @@ void batch_renderer_terminate() {
 
 void batch_renderer_set_sprite_sheet(texture2d* spritesheet) {
     s_data.sprite_sheet = spritesheet;
+    shader_program_bind(s_data.shader);
     shader_program_upload_int(s_data.shader, "u_texture", 0);
 }
 
@@ -111,13 +115,6 @@ void batch_renderer_begin_render(matrix4 view_matrix) {
 }
 
 void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotation, vector2 uv, vector2 cellsize, vector4 color) {
-    if (s_data.index_count >= s_data.max_quads * 6) {
-        s_data.index_count = 0;
-        s_data.vertex_buffer_ptr = s_data.vertex_buffer;
-
-        batch_renderer_end_render();
-    }
-
     subtexture2d subtexture = subtexture2d_create(s_data.sprite_sheet, uv, cellsize, vector2_create(1.0f, 1.0f));
     subtexture_coords coords = subtexture2d_get_texcoords(subtexture);
     vector2 texture_coords[] = {
@@ -145,15 +142,14 @@ void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotatio
 }
 
 void batch_renderer_end_render() {
-    if (s_data.index_count != 0) {
-        u32 vertex_data_size = (u32)((u8*)s_data.vertex_buffer_ptr - (u8*)s_data.vertex_buffer);
-        vertex_buffer_set_data(&s_data.vbo, s_data.vertex_buffer, vertex_data_size, 0);
+    u32 vertex_data_size = (u32)((u8*)s_data.vertex_buffer_ptr - (u8*)s_data.vertex_buffer);
+    vertex_buffer_set_data(&s_data.vbo, s_data.vertex_buffer, vertex_data_size, 0);
 
-        texture2d_bind_unit(s_data.sprite_sheet, 0);
-        shader_program_bind(s_data.shader);
-        render_command_draw_indexed_va_check(&s_data.vao, s_data.index_count);
-        s_data.stats.draw_calls++;
-    }
+    shader_program_bind(s_data.shader);
+    texture2d_bind_unit(s_data.sprite_sheet, 0);
+
+    render_command_draw_indexed_va_check(&s_data.vao, s_data.index_count);
+    s_data.stats.draw_calls++;
 }
 
 void batch_renderer_render_quad(vector2 position, vector2 scale, float rotation, vector4 color) {
@@ -166,13 +162,6 @@ void batch_renderer_render_quad(vector2 position, vector2 scale, float rotation,
 }
 
 void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 color) {
-    if (s_data.index_count >= s_data.max_quads * 6) {
-        s_data.index_count = 0;
-        s_data.vertex_buffer_ptr = s_data.vertex_buffer;
-
-        batch_renderer_end_render();
-    }
-
     vector2 texture_coords[] = {
         vector2_create(0.0f, 0.0f),
         vector2_create(1.0f, 0.0f),
@@ -192,6 +181,9 @@ void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 col
     s_data.stats.quad_count++;
 }
 
+texture2d* batch_renderer_get_sprite_sheet() {
+    return s_data.sprite_sheet;
+}
 batch_renderer_stats batch_renderer_get_stats() {
     return s_data.stats;
 }
