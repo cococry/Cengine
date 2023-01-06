@@ -1,5 +1,5 @@
 {
-    "workbench.colorTheme": "Gruvbox Dark (Hard)",
+    "workbench.colorTheme": "Dark Horizon",
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "editor.minimap.enabled": true,
     "terminal.integrated.fontWeight": "1",
@@ -97,7 +97,8 @@
         "ecs.h": "c",
         "components.h": "c",
         "player_camera.h": "c",
-        "batch_renderer.h": "c"
+        "batch_renderer.h": "c",
+        "systems.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }

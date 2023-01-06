@@ -18,6 +18,7 @@
 
 #include "../ecs/ecs.h"
 #include "../ecs/components.h"
+#include "../ecs/systems.h"
 
 static void
 close_callback(void* data) {
@@ -69,7 +70,7 @@ application* application_create(window_properties props, game_callbacks game_cbs
     asset_pool_init();
     platform_input_init();
     batch_renderer_init();
-    ecs_init(3, sizeof(transform_component), sizeof(sprite_component));
+    ecs_init(3, sizeof(transform_component), sizeof(sprite_component), sizeof(camera_component));
 
     if (ret->game_cbs.game_init_cb != nullptr)
         ret->game_cbs.game_init_cb();
@@ -89,8 +90,10 @@ void application_run(application* app) {
             render_command_clear_buffers(CNGN_COLOR_BUFFER_BIT);
             render_command_clear_color(RGB_COLOR(69, 69, 69), 1.0f);
 
+            start_moving_system();
             if (app->game_cbs.game_update_cb != nullptr)
                 app->game_cbs.game_update_cb();
+            end_moving_system();
             platform_input_update();
         }
         platform_window_update(app->wnd);

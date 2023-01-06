@@ -63,7 +63,6 @@ void ecs_init(u32 component_count, ...) {
     s_state.entty_storage.cap = INITIAL_COMPONENT_CAP;
     s_state.entty_storage.mask_array = malloc(INITIAL_COMPONENT_CAP * sizeof(u32));
     s_state.entty_storage.flag_array = malloc(INITIAL_COMPONENT_CAP * sizeof(u32));
-    s_state.query_result.list = malloc(INITIAL_COMPONENT_CAP * sizeof(u32));
 }
 
 entity entity_create() {
@@ -89,7 +88,10 @@ entity entity_create() {
             s_state.comp_storage.cap *= 2;
         }
     }
-
+    if (s_state.query_result.list == nullptr) {
+        u32* new_query_result_list = realloc(s_state.query_result.list, s_state.entty_storage.cap * 2 * sizeof(u32));
+        s_state.query_result.list = new_query_result_list;
+    }
     s_state.entty_storage.mask_array[id] = 0;
     s_state.entty_storage.flag_array[id] = ENTITY_FLAG_ALIVE;
     entty.id = id;
@@ -127,8 +129,6 @@ ecs_query_result* ecs_query(u32 component_count, ...) {
     va_list ap;
     u32 i, mask = 0;
 
-    s_state.query_result.count = 0;
-
     va_start(ap, component_count);
     for (i = 0; i < component_count; ++i) {
         mask |= (1 << va_arg(ap, u32));
@@ -141,4 +141,8 @@ ecs_query_result* ecs_query(u32 component_count, ...) {
         }
     }
     return &s_state.query_result;
+}
+
+void esc_end_query() {
+    s_state.query_result.count = 0;
 }

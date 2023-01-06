@@ -28,3 +28,5 @@ u32 ecs_has_component(u32 entity_id, u32 component_id);
 void entity_destroy(u32 entity_id);
 
 ecs_query_result* ecs_query(u32 component_count, ...);
+
+void esc_end_query();
