@@ -141,11 +141,6 @@ typedef struct window_properties {
     bool8 vsync, resizable;
 } window_properties;
 
-typedef struct window {
-    window_properties props;
-    void* backend_handle;
-} window;
-
 typedef struct keyboard_struct {
     bool8* keys;
 } keyboard_struct;
@@ -172,6 +167,16 @@ typedef struct input_struct {
     bool8 button_changed;
 
 } input_struct;
+
+typedef struct window {
+    window_properties props;
+    void* backend_handle;
+    input_struct input_state;
+} window;
+
+
+
+
 
 window* platform_window_create(window_properties props);
 
@@ -224,7 +229,7 @@ void _platform_process_mouse_move(u32 xpos, u32 ypos);
 
 void platform_input_update();
 
-void platform_input_init();
+void platform_input_init(input_struct* input);
 
 void platform_input_shutdown();
 

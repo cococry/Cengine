@@ -1,3 +1,9 @@
+#include <cengine/macros.h>
+
+#if CENGINE_IS_LINUX
+#include <GL/glew.h>
+#endif
+
 #include "vertex_array.h"
 
 #include "../platform/opengl/gl_functions.h"

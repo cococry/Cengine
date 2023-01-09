@@ -4,6 +4,12 @@
 
 #include "defines.h"
 
+#include <cengine/macros.h>
+
+#if CENGINE_IS_LINUX
+#define __debugbreak() {}
+#endif
+
 #define LOG_TRACE(fmt, ...)   \
     printf("[TRACE]: ");      \
     printf(fmt, __VA_ARGS__); \

@@ -1,7 +1,15 @@
+#include <cengine/macros.h>
+
+#if CENGINE_IS_WINDOWS
 #include "gl_functions.h"
-
 #include <Windows.h>
+#elif CENGINE_IS_LINUX
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 
+#if CENGINE_IS_WINDOWS
 PFNGLCREATEVERTEXARRAYSPROC glCreateVertexArrays;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLCREATEBUFFERSPROC glCreateBuffers;
@@ -48,8 +56,41 @@ PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
 PFNGLENABLEPROC glEnable;
 PFNGLBLENDFUNCPROC glBlendFunc;
+#else
+#endif
+
+void *load_gl_function_linux(const char *name) {
+  // no need to do anything here because using GLEW.
+  return 0;
+  
+  /*void* handle;
+  char* error;
+  void* fptr = 0;
+  const char* filename = "/usr/lib/x86_64-linux-gnu/libGL.so"; 
+
+
+  handle = dlopen(filename, RTLD_LAZY);
+  if (!handle) {
+    fprintf(stderr, "%s\n", dlerror());
+    exit(1);
+  }
+
+  dlerror();
+
+  void* ptr = dlsym(handle, name);
+
+  if ((error = dlerror()) != NULL) {
+    fprintf(stderr, "%s\n", error);
+    exit(0);
+  }
+  
+  return ptr;*/
+}
 
 void *load_gl_function(const char *name) {
+  #if CENGINE_IS_LINUX
+  return load_gl_function_linux(name);
+  #else
     void *func = (void *)wglGetProcAddress(name);
     if (func == 0 ||
         (func == (void *)0x1) || (func == (void *)0x2) || (func == (void *)0x3) ||
@@ -58,9 +99,13 @@ void *load_gl_function(const char *name) {
         func = (void *)GetProcAddress(module, name);
     }
     return func;
+    #endif
 }
 
 void load_gl_functions() {
+  #if CENGINE_IS_LINUX
+  return;
+#elif CENGINE_IS_WINDOWS
     glBlendFunc =
         (PFNGLBLENDFUNCPROC)load_gl_function("glBlendFunc");
     glEnable =
@@ -146,4 +191,5 @@ void load_gl_functions() {
         (PFNGLACTIVETEXTUREPROC)load_gl_function("glActiveTexture");
     glBindTextureUnit =
         (PFNGLBINDTEXTUREUNITPROC)load_gl_function("glBindTextureUnit");
-}
+    #endif
+  }

@@ -1,9 +1,15 @@
 #include "render_command.h"
+#include <cengine/macros.h>
 
+#if CENGINE_IS_WINDOWS
 #include <Windows.h>
 #include <windowsx.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#elif CENGINE_IS_LINUX
+#include <GL/glew.h>
+#endif
+
 
 void render_command_clear_buffers(u32 buffer_flags) {
     glClear(buffer_flags);

@@ -1,11 +1,25 @@
 #include "gl_loader.h"
+#include <cengine/macros.h>
 
+#if CENGINE_IS_WINDOWS
 #include <Windows.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#else
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#endif
 #include "../../core/logging.h"
+void load_opengl_linux() {
+  // Nothing to do
+}
 
 void load_opengl() {
+
+    #if CENGINE_IS_LINUX
+  return load_opengl_linux();
+  #else
+  
     WNDCLASSEX window_class = {};
     window_class.style = CS_OWNDC;
     window_class.lpfnWndProc = DefWindowProcA;
@@ -51,4 +65,5 @@ void load_opengl() {
 
     bool8 res = wglMakeCurrent(window_dc, render_context);
     ASSERT_MSG(res, "Failed to set Glad-loading rendering context.");
+    #endif
 }
