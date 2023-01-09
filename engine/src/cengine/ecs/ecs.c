@@ -89,7 +89,7 @@ entity entity_create() {
         }
     }
     if (s_state.query_result.list == nullptr) {
-        u32* new_query_result_list = realloc(s_state.query_result.list, s_state.entty_storage.cap * 2 * sizeof(u32));
+        u32* new_query_result_list = malloc(s_state.entty_storage.cap * sizeof(u32));
         s_state.query_result.list = new_query_result_list;
     }
     s_state.entty_storage.mask_array[id] = 0;
@@ -135,14 +135,12 @@ ecs_query_result* ecs_query(u32 component_count, ...) {
     }
     va_end(ap);
 
+    s_state.query_result.count = 0;
+
     for (i = 0; i < s_state.entty_storage.count; ++i) {
         if (0 != (s_state.entty_storage.flag_array[i] & ENTITY_FLAG_ALIVE) && mask == (s_state.entty_storage.mask_array[i] & mask)) {
             s_state.query_result.list[s_state.query_result.count++] = i;
         }
     }
     return &s_state.query_result;
-}
-
-void esc_end_query() {
-    s_state.query_result.count = 0;
 }

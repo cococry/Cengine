@@ -2,6 +2,12 @@
 
 echo Building Cengine...
 
+cd ..
+if not exist bin (
+  mkdir bin
+)
+cd scripts
+
 pushd ..\engine
 call build.bat
 popd
