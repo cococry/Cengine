@@ -1,3 +1,5 @@
+
+
 #ifdef _WIN32
 
 #include "platform.h"
@@ -7,10 +9,12 @@
 
 #include "opengl/gl_loader.h"
 #include "opengl/gl_functions.h"
+#include "opengl/ext/glcorearb.h"
+
+static input_struct input_state;
 
 #include <Windows.h>
 #include <windowsx.h>
-#include "opengl/ext/glcorearb.h"
 #include <stdlib.h>
 
 typedef BOOL(WINAPI* PFNWGLCHOOSEPIXELFORMATARBPROC)(HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
@@ -39,7 +43,6 @@ PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 #define WGL_FULL_ACCELERATION_ARB 0x2027
 #define WGL_TYPE_RGBA_ARB 0x202B
 
-static input_struct input_state;
 static LARGE_INTEGER ticks_per_second, last_tick_count, current_tick_count;
 
 typedef struct win32_backend_handle {
@@ -534,4 +537,5 @@ bool8 platform_mouse_button_changed(mouse_button button) {
     return input_state.button_changed && input_state.mouse_now.buttons[button] != input_state.mouse_prev.buttons[button];
 }
 
+#else
 #endif

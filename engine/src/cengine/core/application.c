@@ -1,3 +1,5 @@
+
+
 #include "application.h"
 #include "event_system.h"
 #include "global_state.h"
@@ -19,6 +21,10 @@
 #include "../ecs/ecs.h"
 #include "../ecs/components.h"
 #include "../ecs/systems.h"
+
+#if CENGINE_IS_LINUX
+#include <GLFW/glfw3.h>
+#endif
 
 static void
 close_callback(void* data) {
@@ -68,7 +74,7 @@ application* application_create(window_properties props, game_callbacks game_cbs
     g_state->entity_count = 0;
 
     asset_pool_init();
-    platform_input_init();
+    platform_input_init(&ret->wnd->input_state);
     batch_renderer_init();
     ecs_init(3, sizeof(transform_component), sizeof(sprite_component), sizeof(camera_component));
 
@@ -78,8 +84,14 @@ application* application_create(window_properties props, game_callbacks game_cbs
     return ret;
 }
 
+
 void application_run(application* app) {
     while (app->state.running) {
+
+      #if CENGINE_IS_LINUX
+          glfwPollEvents();
+      #endif
+      
         if (!app->state.minimized) {
             if (platform_window_close_requested(app->wnd))
                 application_stop(app);

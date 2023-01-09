@@ -82,7 +82,7 @@ void _link_gl_shader_program(shader_program* program, render_id vertex_shader, r
     if (!linking_success) {
         glGetProgramInfoLog(program->id, 512, nullptr, info_log);
 
-        LOG_ERROR("Failed to link shader program.");
+        LOG_ERROR("%s", "Failed to link shader program.");
         LOG_TRACE("%s", info_log);
     } else {
         LOG_INFO("Successfully linked shader program (render id: %i)", program->id);

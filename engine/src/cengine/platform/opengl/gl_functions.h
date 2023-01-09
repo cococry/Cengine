@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cengine/macros.h>
+
+#if CENGINE_IS_WINDOWS
+
 #include "ext/glcorearb.h"
 
 extern PFNGLCREATEVERTEXARRAYSPROC glCreateVertexArrays;
@@ -49,5 +53,5 @@ extern PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
 
 extern PFNGLENABLEPROC glEnable;
 extern PFNGLBLENDFUNCPROC glBlendFunc;
-
+#endif
 void load_gl_functions();
