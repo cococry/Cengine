@@ -141,6 +141,10 @@ void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotatio
     s_data.stats.quad_count++;
 }
 
+void batch_renderer_render_aabb(AABB aabb, vector4 color) {
+    batch_renderer_render_sprite(aabb.position, vector2_create(aabb.half_size.x * 2.0f, aabb.half_size.y * 2.0f),
+                                 0.0f, vector2_create(5.0f, 0.0f), vector2_create(16.0f, 16.0f), color);
+}
 void batch_renderer_end_render() {
     u32 vertex_data_size = (u32)((u8*)s_data.vertex_buffer_ptr - (u8*)s_data.vertex_buffer);
     vertex_buffer_set_data(&s_data.vbo, s_data.vertex_buffer, vertex_data_size, 0);

@@ -194,7 +194,6 @@ window* platform_window_create(window_properties props) {
     u32 windowy = clienty;
     u32 window_width = client_width;
     u32 window_height = client_height;
-
     backend_handle->window_style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION;
     u32 window_ex_style = WS_EX_APPWINDOW;
 

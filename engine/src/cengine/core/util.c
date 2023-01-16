@@ -27,3 +27,7 @@ char* get_file_content(const char* filename) {
 
     return buffer;
 }
+
+float get_random_float(float max) {
+    return (float)rand() / (float)(RAND_MAX / max);
+}

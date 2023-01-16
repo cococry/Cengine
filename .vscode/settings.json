@@ -98,7 +98,9 @@
         "components.h": "c",
         "player_camera.h": "c",
         "batch_renderer.h": "c",
-        "systems.h": "c"
+        "systems.h": "c",
+        "initializer_list": "c",
+        "type_traits": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }
