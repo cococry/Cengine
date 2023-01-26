@@ -100,7 +100,8 @@
         "batch_renderer.h": "c",
         "systems.h": "c",
         "initializer_list": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "xstring": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }

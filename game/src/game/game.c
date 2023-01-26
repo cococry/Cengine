@@ -21,6 +21,7 @@
 
 static entity player;
 static tile_map map;
+static tile_map map_water;
 static entity cam;
 static AABB camera_aabb;
 
@@ -37,10 +38,22 @@ void game_init() {
 
     map = tile_map_create(vector2_create(16.0f, 16.0f), vector2_create(20.0f, 20.0f), vector2_create(0.0f, 0.0f));
 
-    tile_map_register_tile(&map, registered_tile_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0f), vector2_create(1.0f, 0.0f)));
-    tile_map_register_tile(&map, registered_tile_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0f), vector2_create(0.0f, 0.0f)));
+    registered_tile_variant variant_map = registered_tile_variant_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0), vector2_create(1.0f, 5.0f));
+    tile_map_register_tile_variant(&map, variant_map);
+    registered_tile tiles[] = {
+        registered_tile_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0f), vector2_create(1.0f, 5.0f)),
+        registered_tile_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0f), vector2_create(0.0f, 0.0f))};
+    tile_map_register_tiles(&map, tiles, 2);
 
     tile_map_load_from_file(&map, "../game/assets/textures/tilemap.png");
+
+    map_water = tile_map_create(vector2_create(16.0f, 16.0f), vector2_create(20.0f, 20.0f), vector2_create(0.0f, 0.0f));
+
+    registered_tile_variant variant_water_map = registered_tile_variant_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0), vector2_create(1.0f, 2.0f));
+    tile_map_register_tile(&map_water, registered_tile_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0), vector2_create(1.0f, 2.0f)));
+    tile_map_register_tile_variant(&map_water, variant_water_map);
+
+    tile_map_load_from_file(&map_water, "../game/assets/textures/tilemap_water.png");
 
     cam = entity_create();
     camera_component cc = camera_component_create(vector2_create(0.0f, 0.0f), true);
@@ -76,6 +89,7 @@ void game_update() {
 
     batch_renderer_begin_render(cc->view);
     tile_map_render(&map, camera_aabb);
+    tile_map_render(&map_water, camera_aabb);
     batch_renderer_end_render();
 }
 void game_terminate() {

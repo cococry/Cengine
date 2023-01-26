@@ -5,14 +5,23 @@
 
 #include "../../../vendor/stb_image/stb_image.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_REGISTERED_TILE_COUNT 64
-#define TILE_COUNT_IN_CHUNK 32
+#define TILE_COUNT_IN_CHUNK 16
 #define MAX_VISIBLE_CHUNK_COUNT 16
+
+#define INVALID_UV vector2_create(-1.0f, -1.0f)
+#define INVALID_COLOR vector4_create(-1.0f, -1.0f, -1.0f, -1.0f)
+
+typedef struct pixel_neighbour_colors {
+    vector4 color_left, color_right, color_up, color_down;
+    vector4 color_diagonal_left_down, color_diagonal_right_down, color_diagonal_left_up, color_diagonal_right_up;
+} pixel_neighbour_colors;
 
 static bool8 tile_map_find_registered_tile_color(tile_map* map, vector4 color) {
     for (u32 i = 0; i < map->registered_tile_count; i++) {
-        if (vector4_compare(map->regerstered_tiles[i].color, color)) {
+        if (vector4_compare(map->registered_tiles[i].color, color)) {
             return true;
         }
     }
@@ -21,11 +30,29 @@ static bool8 tile_map_find_registered_tile_color(tile_map* map, vector4 color) {
 
 static vector2 tile_get_get_uv_by_color(tile_map* map, vector4 color) {
     for (u32 i = 0; i < map->registered_tile_count; i++) {
-        if (vector4_compare(map->regerstered_tiles[i].color, color)) {
-            return map->regerstered_tiles[i].uv;
+        if (vector4_compare(map->registered_tiles[i].color, color)) {
+            return map->registered_tiles[i].uv;
         }
     }
-    return vector2_create(-1.0f, -1.0f);
+    return INVALID_UV;
+}
+
+static bool8 tile_has_registered_variant(tile_map* map, vector4 color) {
+    for (u32 i = 0; i < map->registered_tile_variatiant_count; i++) {
+        if (vector4_compare(map->registered_tile_variants[i].color, color)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static i32 tile_get_variant_index_by_color(tile_map* map, vector4 color) {
+    for (i32 i = 0; i < map->registered_tile_variatiant_count; i++) {
+        if (vector4_compare(map->registered_tile_variants[i].color, color)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 registered_tile registered_tile_create(vector4 color, vector2 uv) {
@@ -34,28 +61,50 @@ registered_tile registered_tile_create(vector4 color, vector2 uv) {
     ret.uv = uv;
     return ret;
 }
+
+registered_tile_variant registered_tile_variant_create(vector4 color, vector2 base_point) {
+    registered_tile_variant ret;
+    ret.color = color;
+    ret.uv_base_point = base_point;
+    return ret;
+}
 tile_map tile_map_create(vector2 tile_size, vector2 tile_scale, vector2 position) {
     tile_map ret;
     ret.tile_size = tile_size;
     ret.tile_scale = tile_scale;
     ret.registered_tile_count = 0;
+    ret.registered_tile_variatiant_count = 0;
     ret.chunk_aabbs_count = 0;
     ret.position = position;
-    ret.regerstered_tiles = malloc(sizeof(registered_tile) * MAX_REGISTERED_TILE_COUNT);
+    ret.registered_tile_variants = malloc(sizeof(registered_tile) * MAX_REGISTERED_TILE_COUNT);
+    ret.registered_tiles = malloc(sizeof(registered_tile_variant) * MAX_REGISTERED_TILE_COUNT);
     return ret;
 }
 
 void tile_map_register_tiles(tile_map* map, registered_tile* tiles, u32 tile_count) {
-    if (map->regerstered_tiles == nullptr) return;
+    if (map->registered_tiles == nullptr) return;
 
     for (u32 i = map->registered_tile_count; i < tile_count; i++) {
         if (tile_map_find_registered_tile_color(map, tiles[i].color)) continue;
-        map->regerstered_tiles[map->registered_tile_count++] = tiles[i];
+        map->registered_tiles[map->registered_tile_count++] = tiles[i];
     }
 }
 
 void tile_map_register_tile(tile_map* map, registered_tile tile) {
-    map->regerstered_tiles[map->registered_tile_count++] = tile;
+    map->registered_tiles[map->registered_tile_count++] = tile;
+}
+
+void tile_map_register_tile_variants(tile_map* map, registered_tile_variant* tile_variants, u32 tile_variant_count) {
+    if (map->registered_tile_variants == nullptr) return;
+
+    for (u32 i = map->registered_tile_variatiant_count; i < tile_variant_count; i++) {
+        if (tile_map_find_registered_tile_color(map, tile_variants[i].color)) continue;
+        map->registered_tile_variants[map->registered_tile_variatiant_count++] = tile_variants[i];
+    }
+}
+
+void tile_map_register_tile_variant(tile_map* map, registered_tile_variant tile_variant) {
+    map->registered_tile_variants[map->registered_tile_variatiant_count++] = tile_variant;
 }
 
 static void get_pixel(stbi_uc* image, size_t imageWidth, size_t x, size_t y, stbi_uc* r, stbi_uc* g, stbi_uc* b, stbi_uc* a) {
@@ -64,6 +113,147 @@ static void get_pixel(stbi_uc* image, size_t imageWidth, size_t x, size_t y, stb
     *g = p[1];
     *b = p[2];
     *a = p[3];
+}
+
+static pixel_neighbour_colors get_pixel_neighbour_colors(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors ret;
+    if (pixel.x + 1 < image_width) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x + 1, pixel.y, &r, &g, &b, &a);
+        ret.color_right = vector4_create(r, g, b, a);
+    } else {
+        ret.color_right = INVALID_COLOR;
+    }
+
+    if (pixel.x - 1 >= 0) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x - 1, pixel.y, &r, &g, &b, &a);
+        ret.color_left = vector4_create(r, g, b, a);
+    } else {
+        ret.color_left = INVALID_COLOR;
+    }
+
+    if (pixel.y + 1 < image_height) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x, pixel.y + 1, &r, &g, &b, &a);
+        ret.color_up = vector4_create(r, g, b, a);
+    } else {
+        ret.color_up = INVALID_COLOR;
+    }
+    if (pixel.y - 1 >= 0) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x, pixel.y - 1, &r, &g, &b, &a);
+        ret.color_down = vector4_create(r, g, b, a);
+    } else {
+        ret.color_down = INVALID_COLOR;
+    }
+    if (pixel.x - 1 >= 0 && pixel.y - 1 >= 0) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x - 1, pixel.y - 1, &r, &g, &b, &a);
+        ret.color_diagonal_left_down = vector4_create(r, g, b, a);
+    } else {
+        ret.color_diagonal_left_down = INVALID_COLOR;
+    }
+    if (pixel.x + 1 < image_width && pixel.y - 1 >= 0) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x + 1, pixel.y - 1, &r, &g, &b, &a);
+        ret.color_diagonal_right_down = vector4_create(r, g, b, a);
+    } else {
+        ret.color_diagonal_right_down = INVALID_COLOR;
+    }
+    if (pixel.x - 1 < image_width && pixel.y + 1 < image_height) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x - 1, pixel.y + 1, &r, &g, &b, &a);
+        ret.color_diagonal_left_up = vector4_create(r, g, b, a);
+    } else {
+        ret.color_diagonal_left_up = INVALID_COLOR;
+    }
+    if (pixel.x + 1 < image_width && pixel.y + 1 < image_height) {
+        stbi_uc r, g, b, a;
+        get_pixel(image_data, image_width, pixel.x + 1, pixel.y + 1, &r, &g, &b, &a);
+        ret.color_diagonal_right_up = vector4_create(r, g, b, a);
+    } else {
+        ret.color_diagonal_right_up = INVALID_COLOR;
+    }
+    return ret;
+}
+
+static bool8 pixel_no_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    return (vector4_compare(neighbour_colors.color_left, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_right, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_up, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_down, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_diagonal_left_down, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_diagonal_right_down, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_diagonal_left_up, INVALID_COLOR) &&
+            vector4_compare(neighbour_colors.color_diagonal_right_up, INVALID_COLOR));
+}
+static bool8 pixel_left_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_left));
+}
+static bool8 pixel_right_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_right));
+}
+static bool8 pixel_up_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_up));
+}
+static bool8 pixel_down_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_down));
+}
+static bool8 pixel_diagonal_left_up_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_diagonal_left_up));
+}
+static bool8 pixel_diagonal_left_down_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_diagonal_left_down));
+}
+static bool8 pixel_diagonal_right_down_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_diagonal_right_down));
+}
+static bool8 pixel_diagonal_right_up_neighbour(u8* image_data, u32 image_width, u32 image_height, vector2 pixel) {
+    pixel_neighbour_colors neighbour_colors = get_pixel_neighbour_colors(image_data, image_width, image_height, pixel);
+    stbi_uc r, g, b, a;
+    get_pixel(image_data, image_width, pixel.x, pixel.y, &r, &g, &b, &a);
+    return (vector4_compare(vector4_create(r, g, b, a), neighbour_colors.color_diagonal_right_up));
+}
+static registered_tile_variant_uvs get_registered_tile_variant_uvs(registered_tile_variant variant) {
+    registered_tile_variant_uvs ret;
+    ret.uv_diagonal_left_down = vector2_create(variant.uv_base_point.x - 1.0f, variant.uv_base_point.y - 1.0f);
+    ret.uv_diagonal_right_down = vector2_create(variant.uv_base_point.x + 1.0f, variant.uv_base_point.y - 1.0f);
+    ret.uv_diagonal_left_up = vector2_create(variant.uv_base_point.x - 1.0f, variant.uv_base_point.y + 1.0f);
+    ret.uv_diagonal_right_up = vector2_create(variant.uv_base_point.x + 1.0f, variant.uv_base_point.y + 1.0f);
+    ret.uv_left = vector2_create(variant.uv_base_point.x - 1.0f, variant.uv_base_point.y);
+    ret.uv_right = vector2_create(variant.uv_base_point.x + 1.0f, variant.uv_base_point.y);
+    ret.uv_up = vector2_create(variant.uv_base_point.x, variant.uv_base_point.y + 1.0f);
+    ret.uv_down = vector2_create(variant.uv_base_point.x, variant.uv_base_point.y - 1.0f);
+    ret.uv_straight_horizontal = vector2_create(variant.uv_base_point.x + 2.0f, variant.uv_base_point.y - 1.0f);
+    ret.uv_straight_vertical = vector2_create(variant.uv_base_point.x + 3.0f, variant.uv_base_point.y - 1.0f);
+    ret.uv_outstanding_up = vector2_create(variant.uv_base_point.x + 2.0f, variant.uv_base_point.y);
+    ret.uv_outstanding_down = vector2_create(variant.uv_base_point.x + 3.0f, variant.uv_base_point.y);
+    ret.uv_outstanding_left = vector2_create(variant.uv_base_point.x + 3.0f, variant.uv_base_point.y + 1.0f);
+    ret.uv_outstanding_right = vector2_create(variant.uv_base_point.x + 2.0f, variant.uv_base_point.y + 1.0f);
+    return ret;
 }
 void tile_map_load_from_file(tile_map* map, const char* filepath) {
     i32 width, height, number_of_channels;
@@ -85,8 +275,112 @@ void tile_map_load_from_file(tile_map* map, const char* filepath) {
             get_pixel(data, width, x, y, &r, &g, &b, &a);
             vector4 color = vector4_create(r, g, b, a);
             if (tile_map_find_registered_tile_color(map, color)) {
-                map->tiles[y * width + x].uv = tile_get_get_uv_by_color(map, color);
-                map->tile_count++;
+                if (tile_has_registered_variant(map, color)) {
+                    registered_tile_variant_uvs tile_variant = get_registered_tile_variant_uvs(map->registered_tile_variants[tile_get_variant_index_by_color(map, color)]);
+                    if (pixel_no_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_get_get_uv_by_color(map, color);
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_get_get_uv_by_color(map, color);
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_outstanding_left;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_outstanding_right;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_down_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_left_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_outstanding_up;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                               !pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_outstanding_down;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_left;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_right;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_up_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_left_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_down;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_down_neighbour(data, width, height, vector2_create(x, y)) &&
+                               pixel_left_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_up;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_left_neighbour(data, width, height, vector2_create(x, y)) && pixel_up_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_diagonal_right_down;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_left_neighbour(data, width, height, vector2_create(x, y)) && pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_diagonal_right_up;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) && pixel_up_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_diagonal_left_down;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) && pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_diagonal_left_up;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_right_neighbour(data, width, height, vector2_create(x, y)) && pixel_left_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_straight_horizontal;
+                        map->tile_count++;
+                        continue;
+                    } else if (pixel_up_neighbour(data, width, height, vector2_create(x, y)) && pixel_down_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_straight_vertical;
+                        map->tile_count++;
+                        continue;
+                    } else {
+                        map->tiles[y * width + x].uv = tile_get_get_uv_by_color(map, color);
+                        map->tile_count++;
+                        continue;
+                    }
+                    if (pixel_up_neighbour(data, width, height, vector2_create(x, y)) || pixel_down_neighbour(data, width, height, vector2_create(x, y)) &&
+                                                                                             !pixel_left_neighbour(data, width, height, vector2_create(x, y)) &&
+                                                                                             !pixel_right_neighbour(data, width, height, vector2_create(x, y))) {
+                        map->tiles[y * width + x].uv = tile_variant.uv_left;
+                        map->tile_count++;
+                    }
+                } else {
+                    map->tiles[y * width + x].uv = tile_get_get_uv_by_color(map, color);
+                    map->tile_count++;
+                }
+            } else {
+                map->tiles[y * width + x].uv = INVALID_UV;
             }
         }
     }
@@ -126,13 +420,15 @@ void tile_map_chunk_render(tile_map* map, AABB chunk_aabb) {
     for (u32 y = 0; y < TILE_COUNT_IN_CHUNK; y++) {
         for (u32 x = 0; x < TILE_COUNT_IN_CHUNK; x++) {
             u32 tile_index = (chunk_position_begin.y + y) * map->map_size.x + (chunk_position_begin.x + x);
-            batch_renderer_render_sprite(vector2_create(aabb_get_min(chunk_aabb).x + (x * map->tile_scale.y),
-                                                        aabb_get_min(chunk_aabb).y + (y * map->tile_scale.y)),
-                                         map->tile_scale,
-                                         0.0f,
-                                         map->tiles[tile_index].uv,
-                                         map->tile_size,
-                                         vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
+            if (!vector2_compare(map->tiles[tile_index].uv, INVALID_UV)) {
+                batch_renderer_render_sprite(vector2_create(aabb_get_min(chunk_aabb).x + (x * map->tile_scale.y),
+                                                            aabb_get_min(chunk_aabb).y + (y * map->tile_scale.y)),
+                                             map->tile_scale,
+                                             0.0f,
+                                             map->tiles[tile_index].uv,
+                                             map->tile_size,
+                                             vector4_create(1.0f, 1.0f, 1.0f, 1.0f));
+            }
         }
     }
 }
