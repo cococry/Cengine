@@ -13,9 +13,9 @@ void scene_render_system() {
         transform_component* tc = (transform_component*)ecs_get_component(qr->list[i], component_type_transform);
         sprite_component* sc = (sprite_component*)ecs_get_component(qr->list[i], component_type_sprite);
         if (vector2_compare(sc->uv, vector2_create(-1.0f, -1.0f))) {
-            batch_renderer_render_quad(tc->position, tc->scale, tc->rotation, sc->color);
+            batch_renderer_render_quad(tc->position, tc->scale, tc->rotation, sc->color, false);
         } else {
-            batch_renderer_render_sprite(tc->position, tc->scale, tc->rotation, sc->uv, sc->cell_size, sc->color);
+            batch_renderer_render_sprite(tc->position, tc->scale, tc->rotation, sc->uv, sc->cell_size, sc->color, false);
         }
     }
 }

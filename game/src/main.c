@@ -13,7 +13,7 @@ int main(void) {
     window_props.title = "Cengine Testbed";
     window_props.xpos = 0;
     window_props.ypos = 30;
-    window_props.vsync = true;
+    window_props.vsync = false;
     window_props.resizable = true;
     application* app = application_create(window_props, game_cbs);
     application_run(app);

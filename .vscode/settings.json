@@ -101,7 +101,9 @@
         "systems.h": "c",
         "initializer_list": "c",
         "type_traits": "c",
-        "xstring": "c"
+        "xstring": "c",
+        "^1": "c",
+        "ft2build.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
 }

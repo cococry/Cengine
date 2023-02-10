@@ -5,11 +5,6 @@
 
 #include "subtexture2d.h"
 
-typedef struct registered_tile {
-    vector4 color;
-    vector2 uv;
-} registered_tile;
-
 typedef struct registered_tile_variant {
     vector4 color;
     vector2 uv_base_point;
@@ -35,23 +30,15 @@ typedef struct tile_map {
     vector2 position;
     tile_map_tile* tiles;
     u32 tile_count;
-    registered_tile* registered_tiles;
     registered_tile_variant* registered_tile_variants;
     u32 registered_tile_variatiant_count;
-    u32 registered_tile_count;
     AABB* chunk_aabbs;
     u32 chunk_aabbs_count;
 } tile_map;
 
-registered_tile registered_tile_create(vector4 color, vector2 uv);
-
 registered_tile_variant registered_tile_variant_create(vector4 color, vector2 base_point);
 
 tile_map tile_map_create(vector2 tile_size, vector2 tile_scale, vector2 position);
-
-void tile_map_register_tiles(tile_map* map, registered_tile* tiles, u32 tile_count);
-
-void tile_map_register_tile(tile_map* map, registered_tile tile);
 
 void tile_map_register_tile_variants(tile_map* map, registered_tile_variant* tile_variants, u32 tile_variant_count);
 

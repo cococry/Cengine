@@ -38,14 +38,20 @@ PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
 PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 
+PFNGLDRAWARRAYSPROC glDrawArrays;
+
 PFNGLCREATETEXTURESPROC glCreateTextures;
 PFNGLTEXTURESTORAGE2DPROC glTextureStorage2D;
 PFNGLTEXTUREPARAMETERIPROC glTextureParameteri;
 PFNGLTEXTURESUBIMAGE2DPROC glTextureSubImage2D;
+PFNGLTEXIMAGE2DPROC glTexImage2D;
+PFNGLPIXELSTOREIPROC glPixelStorei;
 PFNGLBINDTEXTUREPROC glBindTexture;
+PFNGLTEXPARAMETERIPROC glTexParameteri;
 PFNGLDELETETEXTURESPROC glDeleteTextures;
 PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLBINDTEXTUREUNITPROC glBindTextureUnit;
+PFNGLGENTEXTURESPROC glGenTextures;
 PFNGLENABLEPROC glEnable;
 PFNGLBLENDFUNCPROC glBlendFunc;
 
@@ -141,9 +147,19 @@ void load_gl_functions() {
         (PFNGLTEXTUREPARAMETERIPROC)load_gl_function("glTextureParameteri");
     glTextureSubImage2D =
         (PFNGLTEXTURESUBIMAGE2DPROC)load_gl_function("glTextureSubImage2D");
+    glTexImage2D =
+        (PFNGLTEXIMAGE2DPROC)load_gl_function("glTexImage2D");
     glBindTexture = (PFNGLBINDTEXTUREPROC)load_gl_function("glBindTexture");
     glActiveTexture =
         (PFNGLACTIVETEXTUREPROC)load_gl_function("glActiveTexture");
     glBindTextureUnit =
         (PFNGLBINDTEXTUREUNITPROC)load_gl_function("glBindTextureUnit");
+    glDrawArrays =
+        (PFNGLDRAWARRAYSPROC)load_gl_function("glDrawArrays");
+    glGenTextures =
+        (PFNGLGENTEXTURESPROC)load_gl_function("glGenTextures");
+    glTexParameteri =
+        (PFNGLTEXPARAMETERIPROC)load_gl_function("glTexParameteri");
+    glPixelStorei =
+        (PFNGLPIXELSTOREIPROC)load_gl_function("glPixelStorei");
 }

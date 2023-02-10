@@ -20,6 +20,8 @@
 #include "../ecs/components.h"
 #include "../ecs/systems.h"
 
+#include "../ui/ui_core.h"
+
 static void
 close_callback(void* data) {
     application* app = (application*)data;
@@ -70,6 +72,7 @@ application* application_create(window_properties props, game_callbacks game_cbs
     asset_pool_init();
     platform_input_init();
     batch_renderer_init();
+    ui_init();
     ecs_init(3, sizeof(transform_component), sizeof(sprite_component), sizeof(camera_component));
 
     if (ret->game_cbs.game_init_cb != nullptr)
@@ -106,6 +109,7 @@ void application_shutdown(application* app) {
     destroy_listeners(event_listeners, max_events);
     platform_input_shutdown();
     batch_renderer_terminate();
+    ui_shutdown();
     if (app->game_cbs.game_terminate_cb != nullptr)
         app->game_cbs.game_terminate_cb();
     free(g_state);

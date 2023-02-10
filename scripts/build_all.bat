@@ -9,7 +9,7 @@ if not exist bin (
 cd scripts
 
 pushd ..\engine
-call build.bat
+build.bat
 popd
 
 @echo off

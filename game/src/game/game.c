@@ -12,6 +12,8 @@
 #include <cengine/ecs/components.h>
 #include <cengine/ecs/systems.h>
 #include <cengine/renderer/sprite_animation.h>
+#include <cengine/ui/ui_core.h>
+#include <cengine/ui/font_renderer.h>
 
 #include "player_camera.h"
 
@@ -21,12 +23,14 @@
 
 static entity player;
 static tile_map map;
+
 static tile_map map_water;
 static entity cam;
 static AABB camera_aabb;
+struct font_struct font;
 
 void game_init() {
-    camera_aabb = aabb_create(vector2_create((g_state->app->wnd->props.width / 2.0f), (g_state->app->wnd->props.height / 2.0f)),
+    camera_aabb = aabb_create(vector2_create((g_state->app->wnd->props.width / 2.0f) + 100.0f, (g_state->app->wnd->props.height / 2.0f) + 100.0f),
                               vector2_create((g_state->app->wnd->props.width / 2.0f), (g_state->app->wnd->props.height / 2.0f)));
     batch_renderer_set_sprite_sheet(asset_pool_load_texture("../game/assets/textures/terrain.png"));
 
@@ -38,26 +42,28 @@ void game_init() {
 
     map = tile_map_create(vector2_create(16.0f, 16.0f), vector2_create(20.0f, 20.0f), vector2_create(0.0f, 0.0f));
 
-    registered_tile_variant variant_map = registered_tile_variant_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0), vector2_create(1.0f, 5.0f));
-    tile_map_register_tile_variant(&map, variant_map);
-    registered_tile tiles[] = {
-        registered_tile_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0f), vector2_create(1.0f, 5.0f)),
-        registered_tile_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0f), vector2_create(0.0f, 0.0f))};
-    tile_map_register_tiles(&map, tiles, 2);
+    registered_tile_variant tile_variants[] = {
+        registered_tile_variant_create(vector4_create(0.0f, 255.0f, 0.0f, 255.0), vector2_create(1.0f, 5.0f)),
+        registered_tile_variant_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0), vector2_create(6.0f, 2.0f))};
+    tile_map_register_tile_variants(&map, tile_variants, 2);
 
     tile_map_load_from_file(&map, "../game/assets/textures/tilemap.png");
 
     map_water = tile_map_create(vector2_create(16.0f, 16.0f), vector2_create(20.0f, 20.0f), vector2_create(0.0f, 0.0f));
 
-    registered_tile_variant variant_water_map = registered_tile_variant_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0), vector2_create(1.0f, 2.0f));
-    tile_map_register_tile(&map_water, registered_tile_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0), vector2_create(1.0f, 2.0f)));
-    tile_map_register_tile_variant(&map_water, variant_water_map);
+    registered_tile_variant variants_water_map[] = {
+        registered_tile_variant_create(vector4_create(0.0f, 0.0f, 255.0f, 255.0), vector2_create(1.0f, 2.0f)),
+        registered_tile_variant_create(vector4_create(0.0f, 0.0f, 0.0f, 255.0), vector2_create(6.0f, 2.0f)),
+    };
+    tile_map_register_tile_variants(&map_water, variants_water_map, 2);
 
     tile_map_load_from_file(&map_water, "../game/assets/textures/tilemap_water.png");
 
     cam = entity_create();
     camera_component cc = camera_component_create(vector2_create(0.0f, 0.0f), true);
     ecs_add_component(cam.id, component_type_camera, &cc);
+
+    font = font_renderer_load_file("../engine/assets/fonts/OpenSans/OpenSans-Regular.ttf");
 }
 
 void game_update() {
@@ -86,11 +92,12 @@ void game_update() {
     }
 
     cc->view = translate_mv(matrix4_identity(), vector3_create(cc->position.x, cc->position.y, 0.0f));
-
     batch_renderer_begin_render(cc->view);
     tile_map_render(&map, camera_aabb);
     tile_map_render(&map_water, camera_aabb);
     batch_renderer_end_render();
+
+    render_text("Hello world", vector2_create(0.0f, 0.0f), font);
 }
 void game_terminate() {
 }

@@ -7,6 +7,9 @@
 #define RGB_COLOR(r, g, b) r / 255.0f, g / 255.0f, b / 255.0f
 #define RGBA_COLOR(r, g, b, a) r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f
 
+#define INVALID_UV vector2_create(-1.0f, -1.0f)
+#define INVALID_COLOR vector4_create(-1.0f, -1.0f, -1.0f, -1.0f)
+
 typedef unsigned char bool8;
 typedef unsigned int bool32;
 

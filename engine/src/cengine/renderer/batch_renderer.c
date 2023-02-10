@@ -18,7 +18,7 @@ typedef struct vertex {
     vector3 position;
     vector4 color;
     vector2 texcoord;
-    bool8 use_textures;
+    vector2 sprite_properties;  // x => using textures | y => render as overlay
 } vertex;
 
 typedef struct batch_renderer_data {
@@ -55,7 +55,7 @@ void batch_renderer_init() {
     vertex_buffer_add_layout_attribute(&s_data.vbo, vertex_layout_attribute_create(vertex_layout_attrib_type_vector3f));
     vertex_buffer_add_layout_attribute(&s_data.vbo, vertex_layout_attribute_create(vertex_layout_attrib_type_vector4f));
     vertex_buffer_add_layout_attribute(&s_data.vbo, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
-    vertex_buffer_add_layout_attribute(&s_data.vbo, vertex_layout_attribute_create(vertex_layout_attrib_type_int));
+    vertex_buffer_add_layout_attribute(&s_data.vbo, vertex_layout_attribute_create(vertex_layout_attrib_type_vector2f));
 
     vertex_array_add_vertex_buffer(&s_data.vao, s_data.vbo);
 
@@ -114,7 +114,7 @@ void batch_renderer_begin_render(matrix4 view_matrix) {
     s_data.stats.quad_count = 0;
 }
 
-void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotation, vector2 uv, vector2 cellsize, vector4 color) {
+void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotation, vector2 uv, vector2 cellsize, vector4 color, bool8 render_as_overlay) {
     subtexture2d subtexture = subtexture2d_create(s_data.sprite_sheet, uv, cellsize, vector2_create(1.0f, 1.0f));
     subtexture_coords coords = subtexture2d_get_texcoords(subtexture);
     vector2 texture_coords[] = {
@@ -134,7 +134,8 @@ void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotatio
                                                             vector4_multiply_matrix4(transform, s_data.vertex_positions[i]).z);
         s_data.vertex_buffer_ptr->color = color;
         s_data.vertex_buffer_ptr->texcoord = texture_coords[i];
-        s_data.vertex_buffer_ptr->use_textures = true;
+        s_data.vertex_buffer_ptr->sprite_properties.x = true;
+        s_data.vertex_buffer_ptr->sprite_properties.y = render_as_overlay;
         s_data.vertex_buffer_ptr++;
     }
     s_data.index_count += 6;
@@ -143,7 +144,7 @@ void batch_renderer_render_sprite(vector2 position, vector2 scale, float rotatio
 
 void batch_renderer_render_aabb(AABB aabb, vector4 color) {
     batch_renderer_render_sprite(aabb.position, vector2_create(aabb.half_size.x * 2.0f, aabb.half_size.y * 2.0f),
-                                 0.0f, vector2_create(5.0f, 0.0f), vector2_create(16.0f, 16.0f), color);
+                                 0.0f, vector2_create(5.0f, 0.0f), vector2_create(16.0f, 16.0f), color, false);
 }
 void batch_renderer_end_render() {
     u32 vertex_data_size = (u32)((u8*)s_data.vertex_buffer_ptr - (u8*)s_data.vertex_buffer);
@@ -156,16 +157,16 @@ void batch_renderer_end_render() {
     s_data.stats.draw_calls++;
 }
 
-void batch_renderer_render_quad(vector2 position, vector2 scale, float rotation, vector4 color) {
+void batch_renderer_render_quad(vector2 position, vector2 scale, float rotation, vector4 color, bool8 render_as_overlay) {
     matrix4 transform = matrix4_multiply(
         translate_mv(matrix4_identity(), vector3_create(position.x, position.y, 0.0f)),
         scale_mv(matrix4_identity(), vector3_create(scale.x, scale.y, 0.0f)));
     transform = matrix4_multiply(transform, rotate_mv_angle(matrix4_identity(), degrees_to_radians(rotation), vector3_create(0.0f, 0.0f, 1.0f)));
 
-    _batch_renderer_render_quad_transform_matrix(transform, color);
+    _batch_renderer_render_quad_transform_matrix(transform, color, render_as_overlay);
 }
 
-void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 color) {
+void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 color, bool8 render_as_overlay) {
     vector2 texture_coords[] = {
         vector2_create(0.0f, 0.0f),
         vector2_create(1.0f, 0.0f),
@@ -178,7 +179,8 @@ void _batch_renderer_render_quad_transform_matrix(matrix4 transform, vector4 col
                                                             vector4_multiply_matrix4(transform, s_data.vertex_positions[i]).z);
         s_data.vertex_buffer_ptr->color = color;
         s_data.vertex_buffer_ptr->texcoord = texture_coords[i];
-        s_data.vertex_buffer_ptr->use_textures = false;
+        s_data.vertex_buffer_ptr->sprite_properties.x = false;
+        s_data.vertex_buffer_ptr->sprite_properties.y = render_as_overlay;
         s_data.vertex_buffer_ptr++;
     }
     s_data.index_count += 6;
