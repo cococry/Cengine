@@ -13,7 +13,6 @@
 #include <cengine/ecs/systems.h>
 #include <cengine/renderer/sprite_animation.h>
 #include <cengine/ui/ui_core.h>
-#include <cengine/ui/font_renderer.h>
 
 #include "player_camera.h"
 
@@ -27,7 +26,6 @@ static tile_map map;
 static tile_map map_water;
 static entity cam;
 static AABB camera_aabb;
-struct font_struct font;
 
 void game_init() {
     camera_aabb = aabb_create(vector2_create((g_state->app->wnd->props.width / 2.0f) + 100.0f, (g_state->app->wnd->props.height / 2.0f) + 100.0f),
@@ -62,8 +60,6 @@ void game_init() {
     cam = entity_create();
     camera_component cc = camera_component_create(vector2_create(0.0f, 0.0f), true);
     ecs_add_component(cam.id, component_type_camera, &cc);
-
-    font = font_renderer_load_file("../engine/assets/fonts/OpenSans/OpenSans-Regular.ttf");
 }
 
 void game_update() {
@@ -96,8 +92,6 @@ void game_update() {
     tile_map_render(&map, camera_aabb);
     tile_map_render(&map_water, camera_aabb);
     batch_renderer_end_render();
-
-    render_text("Hello world", vector2_create(0.0f, 0.0f), font);
 }
 void game_terminate() {
 }
